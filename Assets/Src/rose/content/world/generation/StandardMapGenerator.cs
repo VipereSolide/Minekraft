@@ -1,6 +1,7 @@
 using com.rose.content.world.content.block;
 using com.rose.fundation.extensions;
 using UnityEngine;
+using Random = System.Random;
 
 namespace com.rose.content.world.generation
 {
@@ -24,7 +25,8 @@ namespace com.rose.content.world.generation
 
         private bool Chance(float percent)
         {
-            return Random.value < percent / 100;
+            Random r = new(noiseSettings.seed);
+            return r.NextDouble() < percent / 100;
         }
 
         public override BlockEntry GetBlockAtPosition(Vector3Int position, BlockMap map)

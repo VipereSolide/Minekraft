@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using static WorldData;
-using Debug = UnityEngine.Debug;
 
 namespace com.rose.content.world.generation
 {
@@ -84,12 +83,12 @@ namespace com.rose.content.world.generation
             }
 
             var stopwatch = Stopwatch.StartNew();
-            Debug.Log("Updating chunk.");
+            // Debug.Log("Updating chunk.");
 
             Update();
 
             stopwatch.Stop();
-            Debug.Log($"| Elapsed time:        {stopwatch.ElapsedMilliseconds}ms");
+            // Debug.Log($"| Elapsed time:        {stopwatch.ElapsedMilliseconds}ms");
             WorldGenerationDebugger.AddChunkLoadingResult(this, stopwatch.ElapsedMilliseconds);
 
             hasRenderedChunkOnce = true;
@@ -119,7 +118,7 @@ namespace com.rose.content.world.generation
             if (blockAtPosition == null || blockAtPosition.name == "air")
                 return null;
 
-            bool[] facesVisibleState = GetVisibleFacesAtPosition(localPosition);
+            bool[] facesVisibleState = hasRenderedChunkOnce ? GetVisibleFacesAtPosition(localPosition) : GetVisibleFacesAtPositionUsingNaturalBlocks(localPosition);
             HashSet<Matrix4x4> renderedFaces = new(facesVisibleState.Length);
 
             for (int i = 0; i < facesVisibleState.Length; i++)
@@ -162,16 +161,29 @@ namespace com.rose.content.world.generation
         /// A BlockState Array of size 6 containing the neighbouring blocks of the given global position.
         /// The order of the neighbours is as following: x, mX, y, mY, z, mZ.
         /// </returns>
-        public BlockState[] GetBlockNeighbours(Vector3Int globalPosition)
+        public BlockState[] GetBlockStateNeighbours(Vector3Int globalPosition)
         {
             return new BlockState[6]
             {
-            world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(0)),
-            world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(1)),
-            world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(2)),
-            world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(3)),
-            world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(4)),
-            world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(5)),
+                world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(0)),
+                world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(1)),
+                world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(2)),
+                world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(3)),
+                world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(4)),
+                world.GetBlockState(globalPosition + GetOffsetFromNeighbourIndex(5)),
+            };
+        }
+
+        public BlockState[] GetNaturalBlockStateNeighbours(Vector3Int globalPosition)
+        {
+            return new BlockState[6]
+            {
+                world.GetNaturalBlockAtPosition(globalPosition + GetOffsetFromNeighbourIndex(0)).GetDefaultBlockState(),
+                world.GetNaturalBlockAtPosition(globalPosition + GetOffsetFromNeighbourIndex(1)).GetDefaultBlockState(),
+                world.GetNaturalBlockAtPosition(globalPosition + GetOffsetFromNeighbourIndex(2)).GetDefaultBlockState(),
+                world.GetNaturalBlockAtPosition(globalPosition + GetOffsetFromNeighbourIndex(3)).GetDefaultBlockState(),
+                world.GetNaturalBlockAtPosition(globalPosition + GetOffsetFromNeighbourIndex(4)).GetDefaultBlockState(),
+                world.GetNaturalBlockAtPosition(globalPosition + GetOffsetFromNeighbourIndex(5)).GetDefaultBlockState(),
             };
         }
 
@@ -198,7 +210,19 @@ namespace com.rose.content.world.generation
         public bool[] GetVisibleFacesAtPosition(Vector3Int localPosition)
         {
             Vector3Int globalPosition = GetGlobalPositionFromLocalPosition(localPosition);
-            var neighbours = GetBlockNeighbours(globalPosition);
+            var neighbours = GetBlockStateNeighbours(globalPosition);
+            return GetVisibleFacesWithNeighbours(neighbours);
+        }
+
+        /// <summary>
+        /// Returns all visible faces from a local position.
+        /// </summary>
+        /// <param name="localPosition">The position in the chunk.</param>
+        /// <returns>A Boolean array of size 6 containing the visible state of every faces at this position.</returns>
+        public bool[] GetVisibleFacesAtPositionUsingNaturalBlocks(Vector3Int localPosition)
+        {
+            Vector3Int globalPosition = GetGlobalPositionFromLocalPosition(localPosition);
+            var neighbours = GetNaturalBlockStateNeighbours(globalPosition);
             return GetVisibleFacesWithNeighbours(neighbours);
         }
 
@@ -318,7 +342,7 @@ namespace com.rose.content.world.generation
 
         public Bounds GetBounds()
         {
-            return new Bounds(GetChunkGlobalCoordinate() + chunkSize / 2, chunkSize);
+            return new Bounds(GetChunkGlobalCoordinate() + ((Vector3) chunkSize) / 2 - Vector3.one * 0.5F, chunkSize);
         }
     }
 }

@@ -8,6 +8,8 @@ namespace com.rose.debugging.world.generation
         public static WorldGenerationDebugger Instance { get; private set; }
 
         private static bool isStarted = false;
+        public static bool showChunkBorders = false;
+
         public long totalChunkLoadingTime = 0;
 
         private void Awake()
@@ -23,9 +25,15 @@ namespace com.rose.debugging.world.generation
                 {
                     foreach (var chunk in WorldGenerationEngine.Instance.chunks)
                     {
+                        if (!WorldGenerationEngine.Instance.ShouldChunkBeRendered(chunk))
+                            continue;
+
                         chunk.shouldUpdate = true;
                     }
                 }
+
+                if (Input.GetKeyDown(KeyCode.C))
+                    showChunkBorders = !showChunkBorders;
             }
         }
 

@@ -48,11 +48,20 @@ namespace com.rose.content.world.generation
             Render();
         }
 
-        private void OnDrawGizmosSelected()
+        private void OnDrawGizmos()
         {
-            Gizmos.color = new Color(10, 50, 255);
+            if (!WorldGenerationDebugger.showChunkBorders)
+                return;
+
             foreach (var chunk in chunks)
             {
+                if (!ShouldChunkBeRendered(chunk))
+                    continue;
+
+                if (chunk.GetBounds().Contains(cam.transform.position))
+                    Gizmos.color = new Color(1, 0.5F, 0.25F, 1);
+                else
+                    Gizmos.color = new Color(1, 1, 1, 0.05F);
                 Gizmos.DrawWireCube(chunk.GetBounds().center, chunk.GetBounds().size);
             }
         }
