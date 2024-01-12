@@ -20,6 +20,7 @@ namespace com.rose.content.world.generation
         }
 
         [Header("Settings")]
+        public bool randomSeed;
         public Vector3Int mapSize = new(1, 4, 1);
         public BlockMap blocks;
 
@@ -68,8 +69,10 @@ namespace com.rose.content.world.generation
 
         private void Initialize()
         {
-            updateRoutine = new(5);
+            if (randomSeed)
+                generator.noiseSettings.seed = new System.Random().Next(int.MaxValue);
 
+            updateRoutine = new(5);
             chunks = new Chunk[mapSize.x, mapSize.y, mapSize.z];
 
             for (int mapX = 0; mapX < mapSize.x; mapX++)
