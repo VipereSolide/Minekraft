@@ -12,27 +12,34 @@ namespace com.rose.content.world.generation
     [Serializable]
     public class Chunk
     {
-        [SerializeField]
+        private bool isInitialized;
         private WorldGenerationEngine world;
-
-        [SerializeField]
         private Vector3Int coordinate;
 
         public BlockState[,,] blockstates;
 
         public BlockRenderData cache;
-
         public bool shouldUpdate;
+
+        public bool IsInitialized
+        {
+            get { return isInitialized; }
+        }
 
         public Vector3Int Coordinate
         {
             get { return coordinate; }
         }
 
-        public void Initialize(WorldGenerationEngine world, Vector3Int coordinate)
+        public Chunk(WorldGenerationEngine world, Vector3Int coordinate)
         {
-            this.world = world;
             this.coordinate = coordinate;
+            this.world = world;
+        }
+
+        public void Initialize()
+        {
+            isInitialized = true;
 
             PopulateBlockStates();
         }

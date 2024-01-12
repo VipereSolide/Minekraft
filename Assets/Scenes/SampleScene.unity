@@ -403,7 +403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4c9f93cb0ddb0f4cb702cd6cc2afadb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSize: {x: 4, y: 8, z: 4}
+  mapSize: {x: 8, y: 8, z: 8}
   blocks: {fileID: 11400000, guid: 067ccfbe29f95ec49860e1165c4f921a, type: 2}
   faceMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   faceBaseMaterial: {fileID: 2100000, guid: 025a20e356a9fd443a951b534b898231, type: 2}

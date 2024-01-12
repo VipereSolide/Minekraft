@@ -32,8 +32,11 @@ namespace com.rose.fundation
                 Vector3 position = origin + direction * nextCheckLength;
                 Vector3Int positionRounded = Vector3Int.RoundToInt(position);
 
-                BlockEntry blockAtPosition = WorldGenerationEngine.Instance.GetBlockState(positionRounded).entry;
-                if (blockAtPosition.name == "air")
+                BlockState blockAtPosition = WorldGenerationEngine.Instance.GetBlockState(positionRounded);
+                if (blockAtPosition == null)
+                    continue;
+
+                if (blockAtPosition.entry.name == "air")
                     continue;
 
                 onHit?.Invoke(new()

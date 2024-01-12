@@ -40,6 +40,7 @@ namespace com.rose.content.world.generation
 
         private void Update()
         {
+            InitializeNearbyChunks();
             Render();
         }
 
@@ -54,7 +55,7 @@ namespace com.rose.content.world.generation
 
         private void Initialize()
         {
-            void InitializeChunks()
+            void InitializeChunksMap()
             {
                 chunks = new Chunk[mapSize.x, mapSize.y, mapSize.z];
 
@@ -64,16 +65,38 @@ namespace com.rose.content.world.generation
                     {
                         for (int mapY = 0; mapY < mapSize.y; mapY++)
                         {
-                            chunks[mapX, mapY, mapZ] = new Chunk();
-                            var chunk = chunks[mapX, mapY, mapZ];
+                            chunks[mapX, mapY, mapZ] = new Chunk(this, new Vector3Int(mapX, mapY, mapZ));
 
-                            chunk.Initialize(this, new Vector3Int(mapX, mapY, mapZ));
+                            // var chunk = chunks[mapX, mapY, mapZ];
+                            // chunk.Initialize(this, new Vector3Int(mapX, mapY, mapZ));
                         }
                     }
                 }
             }
 
-            InitializeChunks();
+            InitializeChunksMap();
+        }
+
+        protected virtual void InitializeNearbyChunks()
+        {
+            for (int mapX = 0; mapX < mapSize.x; mapX++)
+            {
+                for (int mapZ = 0; mapZ < mapSize.z; mapZ++)
+                {
+                    for (int mapY = 0; mapY < mapSize.y; mapY++)
+                    {
+                        var chunk = chunks[mapX, mapY, mapZ];
+
+                        if (chunk.IsInitialized)
+                            continue;
+
+                        if (ShouldChunkBeRendered(chunk))
+                        {
+                            chunk.Initialize();
+                        }
+                    }
+                }
+            }
         }
 
         public virtual bool ShouldChunkBeRendered(Chunk chunk)
@@ -83,7 +106,7 @@ namespace com.rose.content.world.generation
                 return false;
 
             planes = GeometryUtility.CalculateFrustumPlanes(cam);
-            bool frustumOcclusionCulling = GeometryUtility.TestPlanesAABB(planes, chunk.GetBounds()));
+            bool frustumOcclusionCulling = GeometryUtility.TestPlanesAABB(planes, chunk.GetBounds());
 
             return frustumOcclusionCulling;
         }
@@ -92,7 +115,7 @@ namespace com.rose.content.world.generation
         {
             foreach (var chunk in chunks)
             {
-                if (ShouldChunkBeRendered(chunk))
+                if (chunk.IsInitialized && ShouldChunkBeRendered(chunk))
                 {
                     foreach (var key in chunk.GetRenderData().blocks)
                     {
@@ -167,7 +190,7 @@ namespace com.rose.content.world.generation
 
             Chunk chunk = GetChunkFromGlobalPosition(globalPosition);
 
-            if (chunk == null)
+            if (chunk == null || !chunk.IsInitialized)
                 return null;
 
             return chunk.GetBlockState(localPosition);
