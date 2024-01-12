@@ -303,5 +303,10 @@ namespace com.rose.content.world.generation
                 }
             }
         }
+
+        public Bounds GetBounds()
+        {
+            return new Bounds(GetChunkGlobalCoordinate() + chunkSize / 2, chunkSize);
+        }
     }
 }

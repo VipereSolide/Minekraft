@@ -24,10 +24,13 @@ namespace com.rose.content.world.generation
         [Space]
         public Mesh faceMesh;
         public Material faceBaseMaterial;
+        public Camera cam;
 
         [Header("Runtime Data")]
         public StandardMapGenerator generator = new();
         public Chunk[,,] chunks;
+
+        public Plane[] planes;
 
         private void Awake()
         {
@@ -45,8 +48,7 @@ namespace com.rose.content.world.generation
             Gizmos.color = new Color(10, 50, 255);
             foreach (var chunk in chunks)
             {
-                Vector3Int pos = new Vector3Int(chunk.Coordinate.x * WorldData.chunkSize.x, chunk.Coordinate.y * WorldData.chunkSize.y, chunk.Coordinate.z * WorldData.chunkSize.z) + (WorldData.chunkSize / 2);
-                Gizmos.DrawWireCube(pos, WorldData.chunkSize);
+                Gizmos.DrawWireCube(chunk.GetBounds().center, chunk.GetBounds().size);
             }
         }
 
@@ -76,11 +78,16 @@ namespace com.rose.content.world.generation
 
         protected virtual void Render()
         {
+            planes = GeometryUtility.CalculateFrustumPlanes(cam);
+
             foreach (var chunk in chunks)
             {
-                foreach (var key in chunk.GetRenderData().blocks)
+                if (GeometryUtility.TestPlanesAABB(planes, chunk.GetBounds()))
                 {
-                    Graphics.DrawMeshInstanced(faceMesh, 0, key.blockEntry.GetModifiedMaterial(faceBaseMaterial), key.voxels.ToArray());
+                    foreach (var key in chunk.GetRenderData().blocks)
+                    {
+                        Graphics.DrawMeshInstanced(faceMesh, 0, key.blockEntry.GetModifiedMaterial(faceBaseMaterial), key.voxels.ToArray());
+                    }
                 }
             }
         }
