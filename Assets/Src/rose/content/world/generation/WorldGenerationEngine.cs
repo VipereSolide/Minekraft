@@ -1,5 +1,6 @@
 using com.rose.content.world.content.block;
 using com.rose.debugging.world.generation;
+using com.rose.fundation.extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -79,9 +80,6 @@ namespace com.rose.content.world.generation
                         for (int mapY = 0; mapY < mapSize.y; mapY++)
                         {
                             chunks[mapX, mapY, mapZ] = new Chunk(this, new Vector3Int(mapX, mapY, mapZ));
-
-                            // var chunk = chunks[mapX, mapY, mapZ];
-                            // chunk.Initialize(this, new Vector3Int(mapX, mapY, mapZ));
                         }
                     }
                 }
@@ -114,8 +112,9 @@ namespace com.rose.content.world.generation
 
         public virtual bool ShouldChunkBeRendered(Chunk chunk)
         {
-            float distanceFromCamera = Vector3.Distance(chunk.GetChunkGlobalCoordinate(), cam.transform.position);
-            if (distanceFromCamera > WorldData.viewDistance)
+            float distanceFromCameraHorizontal = Vector3.Distance(chunk.GetChunkGlobalCoordinate().WithY(0), cam.transform.position.WithY(0));
+            float distanceFromCameraVertical = Vector3.Distance(chunk.GetChunkGlobalCoordinate().WithX(0).WithZ(0), cam.transform.position.WithX(0).WithZ(0));
+            if (distanceFromCameraHorizontal > WorldData.horizontalRenderDistance || distanceFromCameraVertical > WorldData.verticalRenderDistance)
                 return false;
 
             planes = GeometryUtility.CalculateFrustumPlanes(cam);
