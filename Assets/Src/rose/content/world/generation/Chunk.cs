@@ -92,6 +92,7 @@ namespace com.rose.content.world.generation
             WorldGenerationDebugger.AddChunkLoadingResult(this, stopwatch.ElapsedMilliseconds);
 
             hasRenderedChunkOnce = true;
+            GC.Collect();
         }
 
         public void UpdateRenderDataCache()
