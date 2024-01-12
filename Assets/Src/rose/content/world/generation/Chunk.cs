@@ -1,9 +1,11 @@
 using com.rose.content.world.content.block;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using UnityEngine;
 using static WorldData;
+using Debug = UnityEngine.Debug;
 
 namespace com.rose.content.world.generation
 {
@@ -75,8 +77,13 @@ namespace com.rose.content.world.generation
             {
                 if (cache == null)
                 {
-                    Debug.Log("Updating chunk asynchrounously...");
+                    var stopwatch = Stopwatch.StartNew();
+                    Debug.Log("Updating chunk asynchrounously.");
+
                     Parallel.Invoke(Update);
+
+                    stopwatch.Stop();
+                    Debug.Log($"| Elapsed time:          {stopwatch.ElapsedMilliseconds}ms");
                 }
                 else
                 {
