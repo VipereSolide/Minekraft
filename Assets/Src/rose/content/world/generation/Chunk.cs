@@ -92,7 +92,6 @@ namespace com.rose.content.world.generation
             WorldGenerationDebugger.AddChunkLoadingResult(this, stopwatch.ElapsedMilliseconds);
 
             hasRenderedChunkOnce = true;
-            GC.Collect();
         }
 
         public void UpdateRenderDataCache()
@@ -110,6 +109,25 @@ namespace com.rose.content.world.generation
         }
 
         /// <param name="localPosition">Position of the block inside the chunk (I.e. 1, 8, 31)</param>
+        /*protected virtual Tuple<BlockEntry, Matrix4x4[]> GetRenderDataAtPosition(Vector3Int localPosition)
+        {
+            // The rendered position's coordinates in global space instead of chunk space.
+            Vector3Int globalPosition = GetGlobalPositionFromLocalPosition(localPosition);
+            BlockEntry blockAtPosition = GetBlockState(localPosition).entry;
+
+            if (blockAtPosition == null || blockAtPosition.name == "air")
+                return null;
+
+            bool[] facesVisibleState = hasRenderedChunkOnce ? GetVisibleFacesAtPosition(localPosition) : GetVisibleFacesAtPositionUsingNaturalBlocks(localPosition);
+            Matrix4x4[] renderedFaces = new Matrix4x4[facesVisibleState.Length];
+
+            for (int i = 0; i < facesVisibleState.Length; i++)
+                if (facesVisibleState[i])
+                    renderedFaces[i] = GetRenderedFace(globalPosition, i);
+
+            return new Tuple<BlockEntry, Matrix4x4[]>(blockAtPosition, renderedFaces);
+        }*/
+
         protected virtual Tuple<BlockEntry, HashSet<Matrix4x4>> GetRenderDataAtPosition(Vector3Int localPosition)
         {
             // The rendered position's coordinates in global space instead of chunk space.
@@ -142,7 +160,7 @@ namespace com.rose.content.world.generation
 
         public Vector3Int GetChunkGlobalCoordinate()
         {
-            return world.GetChunkGlobalPosition(coordinate);
+            return WorldGenerationEngine.GetChunkGlobalPosition(coordinate);
         }
 
         /// <summary>

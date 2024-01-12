@@ -403,11 +403,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4c9f93cb0ddb0f4cb702cd6cc2afadb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSize: {x: 96, y: 8, z: 96}
+  mapSize: {x: 8, y: 8, z: 8}
   blocks: {fileID: 11400000, guid: 067ccfbe29f95ec49860e1165c4f921a, type: 2}
+  player: {fileID: 2003425548}
   faceMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   faceBaseMaterial: {fileID: 2100000, guid: 025a20e356a9fd443a951b534b898231, type: 2}
-  cam: {fileID: 330585545}
   generator:
     noiseSettings: {fileID: 11400000, guid: 82a8f21957e4e694ea75c22e87e9839e, type: 2}
     maxHeight: 128
@@ -835,7 +835,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 2003425547}
-  camera: {fileID: 330585545}
+  playerCamera: {fileID: 330585545}
 --- !u!114 &2003425549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -852,7 +852,9 @@ MonoBehaviour:
   checkInterval: 0.1
   player: {fileID: 2003425548}
   previewingBlockMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  previewingBlockMaterial: {fileID: 2100000, guid: 7535df638eefd0f42aa7ccbf7e5207cd,
+  previewingDestroyBlockMaterial: {fileID: 2100000, guid: f954610332798234ca90202f5ad7cbc9,
+    type: 2}
+  previewingPlaceBlockMaterial: {fileID: 2100000, guid: 7535df638eefd0f42aa7ccbf7e5207cd,
     type: 2}
   isHitting: 0
 --- !u!1660057539 &9223372036854775807

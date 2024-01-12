@@ -68,5 +68,16 @@ namespace com.rose.content.world.generation
             else
                 blocks.Add(new(data));
         }
+
+        public void Add(Tuple<BlockEntry, Matrix4x4[]> data)
+        {
+            if (data == null)
+                return;
+
+            if (blocks.Contains(data.Item1))
+                blocks[data.Item1].voxels.AddRange(data.Item2);
+            else
+                blocks.Add(new(data.Item1, data.Item2.ToHashSet()));
+        }
     }
 }

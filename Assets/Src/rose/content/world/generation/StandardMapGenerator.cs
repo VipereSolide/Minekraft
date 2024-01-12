@@ -25,8 +25,8 @@ namespace com.rose.content.world.generation
 
         private bool Chance(float percent)
         {
-            Random r = new(noiseSettings.seed);
-            return r.NextDouble() < percent / 100;
+            Random r = new();
+            return r.Next(101) < percent;
         }
 
         public override BlockEntry GetBlockAtPosition(Vector3Int position, BlockMap map)

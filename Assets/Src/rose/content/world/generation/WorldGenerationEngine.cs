@@ -1,6 +1,6 @@
 using com.rose.content.world.content.block;
+using com.rose.content.world.entity.player;
 using com.rose.debugging.world.generation;
-using com.rose.fundation.extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,9 +25,9 @@ namespace com.rose.content.world.generation
         public BlockMap blocks;
 
         [Space]
+        public Player player;
         public Mesh faceMesh;
         public Material faceBaseMaterial;
-        public Camera cam;
 
         [Header("Runtime Data")]
         public StandardMapGenerator generator = new();
@@ -54,99 +54,96 @@ namespace com.rose.content.world.generation
             if (!WorldGenerationDebugger.showChunkBorders)
                 return;
 
-            foreach (var chunk in chunks)
+            foreach (var chunk in GetNearbyChunks(player.GetGlobalPosition(), 3))
             {
                 if (!ShouldChunkBeRendered(chunk))
                     continue;
 
-                if (chunk.GetBounds().Contains(cam.transform.position))
-                    Gizmos.color = new Color(1, 0.5F, 0.25F, 1);
-                else
-                    Gizmos.color = new Color(1, 1, 1, 0.05F);
+                Gizmos.color = (chunk.Coordinate == player.GetChunkCoordinate()) ? new Color(1, 0.5F, 0.25F, 1) : Gizmos.color = new Color(1, 1, 1, 0.05F);
                 Gizmos.DrawWireCube(chunk.GetBounds().center, chunk.GetBounds().size);
             }
         }
 
         private void Initialize()
         {
-            void InitializeChunksMap()
-            {
-                chunks = new Chunk[mapSize.x, mapSize.y, mapSize.z];
+            chunks = new Chunk[mapSize.x, mapSize.y, mapSize.z];
 
-                for (int mapX = 0; mapX < mapSize.x; mapX++)
-                {
-                    for (int mapZ = 0; mapZ < mapSize.z; mapZ++)
-                    {
-                        for (int mapY = 0; mapY < mapSize.y; mapY++)
-                        {
-                            chunks[mapX, mapY, mapZ] = new Chunk(this, new Vector3Int(mapX, mapY, mapZ));
-                        }
-                    }
-                }
-            }
-
-            InitializeChunksMap();
+            for (int mapX = 0; mapX < mapSize.x; mapX++)
+                for (int mapZ = 0; mapZ < mapSize.z; mapZ++)
+                    for (int mapY = 0; mapY < mapSize.y; mapY++)
+                        chunks[mapX, mapY, mapZ] = new Chunk(this, new Vector3Int(mapX, mapY, mapZ));
+            //a
         }
 
         protected virtual void InitializeNearbyChunks()
         {
-            for (int mapX = 0; mapX < mapSize.x; mapX++)
+            foreach (var chunk in GetNearbyChunks())
+                if (!chunk.IsInitialized && ShouldChunkBeRendered(chunk))
+                    chunk.Initialize();
+        }
+
+        public virtual bool ShouldChunkBeRendered(Chunk chunk)
+        {
+            //float distanceFromCameraVertical = Vector3.Distance(chunk.GetChunkGlobalCoordinate().WithX(0).WithZ(0), player.GetGlobalPosition().WithX(0).WithZ(0));
+            //if ( || distanceFromCameraVertical > WorldData.verticalRenderDistance)
+            //    return false;
+
+            planes = GeometryUtility.CalculateFrustumPlanes(player.playerCamera);
+            return GeometryUtility.TestPlanesAABB(planes, chunk.GetBounds());
+        }
+
+        protected virtual async void UpdateChunksRenderDataCache()
+        {
+            foreach (var chunk in GetNearbyChunks())
             {
-                for (int mapZ = 0; mapZ < mapSize.z; mapZ++)
+                if (chunk.IsInitialized && ShouldChunkBeRendered(chunk))
                 {
-                    for (int mapY = 0; mapY < mapSize.y; mapY++)
+                    if (chunk.hasRenderedChunkOnce)
                     {
-                        var chunk = chunks[mapX, mapY, mapZ];
-
-                        if (chunk.IsInitialized)
-                            continue;
-
-                        if (ShouldChunkBeRendered(chunk))
-                        {
-                            chunk.Initialize();
-                        }
+                        chunk.UpdateRenderDataCache();
+                    }
+                    else
+                    {
+                        await Task.Run(() => chunk.UpdateRenderDataCache());
                     }
                 }
             }
         }
 
-        public virtual bool ShouldChunkBeRendered(Chunk chunk)
+        public HashSet<Chunk> GetNearbyChunks(Vector3Int globalPosition, int radius)
         {
-            float distanceFromCameraHorizontal = Vector3.Distance(chunk.GetChunkGlobalCoordinate().WithY(0), cam.transform.position.WithY(0));
-            float distanceFromCameraVertical = Vector3.Distance(chunk.GetChunkGlobalCoordinate().WithX(0).WithZ(0), cam.transform.position.WithX(0).WithZ(0));
-            if (distanceFromCameraHorizontal > WorldData.horizontalRenderDistance || distanceFromCameraVertical > WorldData.verticalRenderDistance)
-                return false;
+            Vector3Int chunkPosition = GetChunkCoordinateFromGlobalPosition(globalPosition);
+            int halfRadius = Mathf.RoundToInt((float) radius / 2);
+            HashSet<Chunk> result = new();
 
-            planes = GeometryUtility.CalculateFrustumPlanes(cam);
-            bool frustumOcclusionCulling = GeometryUtility.TestPlanesAABB(planes, chunk.GetBounds());
-
-            return frustumOcclusionCulling;
-        }
-
-        protected virtual async void UpdateChunksRenderDataCache()
-        {
-            List<Task> tasks = new();
-
-            foreach (var chunk in chunks)
+            for (int x = -halfRadius; x < halfRadius; x++)
             {
-                if (chunk.IsInitialized && ShouldChunkBeRendered(chunk))
+                for (int y = -halfRadius; y < halfRadius; y++)
                 {
-                    if (chunk.hasRenderedChunkOnce)
-                        chunk.UpdateRenderDataCache();
-                    else
-                        tasks.Add(new(() => chunk.UpdateRenderDataCache()));
+                    for (int z = -halfRadius; z < halfRadius; z++)
+                    {
+                        Vector3Int currentCoordinate = chunkPosition + new Vector3Int(x, y, z);
+
+                        // Respect lower bounds.
+                        if (currentCoordinate.x >= 0 && currentCoordinate.y >= 0 && currentCoordinate.z >= 0)
+                            // Respect higher bounds.
+                            if (currentCoordinate.x < mapSize.x && currentCoordinate.y < mapSize.y && currentCoordinate.z < mapSize.z)
+                                result.Add(chunks[currentCoordinate.x, currentCoordinate.y, currentCoordinate.z]);
+                    }
                 }
             }
 
-            foreach (var task in tasks)
-                task.Start();
+            return result;
+        }
 
-            await Task.WhenAll(tasks);
+        public HashSet<Chunk> GetNearbyChunks()
+        {
+            return GetNearbyChunks(player.GetGlobalPosition(), WorldData.horizontalRenderDistance);
         }
 
         protected virtual void Render()
         {
-            foreach (var chunk in chunks)
+            foreach (var chunk in GetNearbyChunks())
             {
                 if (chunk.IsInitialized && ShouldChunkBeRendered(chunk))
                 {
@@ -175,31 +172,30 @@ namespace com.rose.content.world.generation
 
         public void RegisterWorldChange(Vector3Int globalPosition, BlockState newState, bool updateFlag = true)
         {
-            Chunk chunk = GetChunkFromGlobalPosition(globalPosition);
-            Vector3Int localPosition = GetChunkLocalPositionFromGlobalPosition(globalPosition);
-            chunk.SetBlockState(localPosition, newState, updateFlag);
+            GetChunkFromGlobalPosition(globalPosition).SetBlockState(GetChunkLocalPositionFromGlobalPosition(globalPosition), newState, updateFlag);
         }
 
         public Chunk[] AllChunks()
         {
-            List<Chunk> chunks = new List<Chunk>();
+            List<Chunk> chunks = new();
+
             foreach (var chunk in this.chunks)
                 chunks.Add(chunk);
 
             return chunks.ToArray();
         }
 
-        public Vector3Int GetChunkCoordinateFromGlobalPosition(Vector3Int position)
+        public static Vector3Int GetChunkCoordinateFromGlobalPosition(Vector3Int position)
         {
             return new Vector3Int(Mathf.RoundToInt(position.x / WorldData.chunkSize.x), Mathf.RoundToInt(position.y / WorldData.chunkSize.y), Mathf.RoundToInt(position.z / WorldData.chunkSize.z));
         }
 
-        public Vector3Int GetChunkGlobalPosition(Vector3Int chunkGlobalPosition)
+        public static Vector3Int GetChunkGlobalPosition(Vector3Int chunkGlobalPosition)
         {
             return new Vector3Int(chunkGlobalPosition.x * WorldData.chunkSize.x, chunkGlobalPosition.y * WorldData.chunkSize.y, chunkGlobalPosition.z * WorldData.chunkSize.z);
         }
 
-        public Vector3Int GetChunkLocalPositionFromGlobalPosition(Vector3Int position)
+        public static Vector3Int GetChunkLocalPositionFromGlobalPosition(Vector3Int position)
         {
             Vector3Int chunkGlobalPosition = GetChunkGlobalPosition(GetChunkCoordinateFromGlobalPosition(position));
             Vector3Int relativeCoordinates = new(position.x - chunkGlobalPosition.x, position.y - chunkGlobalPosition.y, position.z - chunkGlobalPosition.z);
@@ -208,17 +204,16 @@ namespace com.rose.content.world.generation
 
         public BlockEntry GetNaturalBlockAtPosition(Vector3Int globalPosition)
         {
-            //if (modifiedBlockEntries.ContainsKey(position))
-            //    return modifiedBlockEntries[position];
-
             return generator.GetBlockAtPosition(globalPosition, blocks);
         }
 
         public Chunk GetChunkFromCoordinate(Vector3Int chunkCoordinate)
         {
-            foreach (var chunk in chunks)
-                if (chunk.Coordinate == chunkCoordinate)
-                    return chunk;
+            // Respect lower bounds.
+            if (chunkCoordinate.x >= 0 && chunkCoordinate.y >= 0 && chunkCoordinate.z >= 0)
+                // Respect higher bounds.
+                if (chunkCoordinate.x < mapSize.x && chunkCoordinate.y < mapSize.y && chunkCoordinate.z < mapSize.z)
+                    return chunks[chunkCoordinate.x, chunkCoordinate.y, chunkCoordinate.z];
 
             return null;
         }
@@ -231,10 +226,13 @@ namespace com.rose.content.world.generation
         public BlockState GetBlockState(Vector3Int globalPosition)
         {
             Vector3Int localPosition = GetChunkLocalPositionFromGlobalPosition(globalPosition);
+            // Respect lower bounds.
             if (localPosition.x < 0 || localPosition.y < 0 || localPosition.z < 0)
-            {
                 return null;
-            }
+
+            // Respect higher bounds.
+            if (localPosition.x >= WorldData.chunkSize.x || localPosition.y >= WorldData.chunkSize.y || localPosition.z >= WorldData.chunkSize.z)
+                return null;
 
             Chunk chunk = GetChunkFromGlobalPosition(globalPosition);
 

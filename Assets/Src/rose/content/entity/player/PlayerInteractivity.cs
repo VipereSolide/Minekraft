@@ -16,7 +16,8 @@ namespace com.rose.content.world.entity.player
         [Space]
 
         public Mesh previewingBlockMesh;
-        public Material previewingBlockMaterial;
+        public Material previewingDestroyBlockMaterial;
+        public Material previewingPlaceBlockMaterial;
 
         [Header("Runtime Data")]
         public bool isHitting;
@@ -30,16 +31,20 @@ namespace com.rose.content.world.entity.player
 
         private void Update()
         {
-            isHitting = CameraUtility.Raycast(transform.position, player.camera.transform.forward, checkCount, checkInterval, (hitResult) =>
+            isHitting = CameraUtility.Raycast(transform.position, player.playerCamera.transform.forward, checkCount, checkInterval, (hitResult) =>
             {
                 currentHitResult = hitResult;
             });
 
             if (isHitting)
             {
-                Matrix4x4 m = new();
-                m.SetTRS(currentHitResult.GetRoundedPosition() + currentHitResult.GetRoundedDirection(), Quaternion.identity, Vector3.one);
-                Graphics.DrawMesh(previewingBlockMesh, m, previewingBlockMaterial, 0);
+                Matrix4x4 matrice = new();
+
+                matrice.SetTRS(currentHitResult.GetRoundedPosition() + currentHitResult.GetRoundedDirection(), Quaternion.identity, Vector3.one);
+                Graphics.DrawMesh(previewingBlockMesh, matrice, previewingPlaceBlockMaterial, 0);
+
+                matrice.SetTRS(currentHitResult.GetRoundedPosition(), Quaternion.identity, Vector3.one);
+                Graphics.DrawMesh(previewingBlockMesh, matrice, previewingDestroyBlockMaterial, 0);
             }
         }
 
@@ -49,7 +54,7 @@ namespace com.rose.content.world.entity.player
             for (int i = 0; i < checkCount; i++)
             {
                 nextCheckLength += checkInterval;
-                Vector3 pos = transform.position + player.camera.transform.forward * nextCheckLength;
+                Vector3 pos = transform.position + player.playerCamera.transform.forward * nextCheckLength;
                 Gizmos.DrawLine(transform.position, pos);
                 Gizmos.DrawSphere(pos, 0.05F);
             }
