@@ -76,13 +76,23 @@ namespace com.rose.content.world.generation
             InitializeChunks();
         }
 
+        public virtual bool ShouldChunkBeRendered(Chunk chunk)
+        {
+            float distanceFromCamera = Vector3.Distance(chunk.GetChunkGlobalCoordinate(), cam.transform.position);
+            if (distanceFromCamera > WorldData.viewDistance)
+                return false;
+
+            planes = GeometryUtility.CalculateFrustumPlanes(cam);
+            bool frustumOcclusionCulling = GeometryUtility.TestPlanesAABB(planes, chunk.GetBounds()));
+
+            return frustumOcclusionCulling;
+        }
+
         protected virtual void Render()
         {
-            planes = GeometryUtility.CalculateFrustumPlanes(cam);
-
             foreach (var chunk in chunks)
             {
-                if (GeometryUtility.TestPlanesAABB(planes, chunk.GetBounds()))
+                if (ShouldChunkBeRendered(chunk))
                 {
                     foreach (var key in chunk.GetRenderData().blocks)
                     {
