@@ -6,15 +6,41 @@ namespace com.rose.content.world.entity.player
 {
     public class PlayerInteractivity : MonoBehaviour
     {
-        public Player player;
-
+        [Header("Settings")]
         public int checkCount;
         public float checkInterval;
+
+        [Header("Resources")]
+        public Player player;
+
+        [Space]
+
+        public Mesh previewingBlockMesh;
+        public Material previewingBlockMaterial;
+
+        [Header("Runtime Data")]
+        public bool isHitting;
+        public BlockHitResult currentHitResult;
 
         private void Awake()
         {
             player.input.onAttack += OnAttack;
             player.input.onUse += OnUse;
+        }
+
+        private void Update()
+        {
+            isHitting = CameraUtility.Raycast(transform.position, player.camera.transform.forward, checkCount, checkInterval, (hitResult) =>
+            {
+                currentHitResult = hitResult;
+            });
+
+            if (isHitting)
+            {
+                Matrix4x4 m = new();
+                m.SetTRS(currentHitResult.GetRoundedPosition() + currentHitResult.GetRoundedDirection(), Quaternion.identity, Vector3.one);
+                Graphics.DrawMesh(previewingBlockMesh, m, previewingBlockMaterial, 0);
+            }
         }
 
         private void OnDrawGizmosSelected()
@@ -31,22 +57,17 @@ namespace com.rose.content.world.entity.player
 
         private void OnUse()
         {
-            CameraUtility.Raycast(transform.position, player.camera.transform.forward, checkCount, checkInterval, (hitResult) =>
+            if (isHitting)
             {
-                Vector3Int dir = Vector3Int.RoundToInt(hitResult.direction);
-                Debug.Log(dir);
-                Vector3Int positionRounded = Vector3Int.RoundToInt(hitResult.position) + dir;
+                Vector3Int positionRounded = currentHitResult.GetRoundedPosition() + currentHitResult.GetRoundedDirection();
                 WorldGenerationEngine.Instance.RegisterWorldChange(positionRounded, WorldGenerationEngine.Instance.blocks.GetEntryByName("stone").GetDefaultBlockState());
-            });
+            }
         }
 
         private void OnAttack()
         {
-            CameraUtility.Raycast(transform.position, player.camera.transform.forward, checkCount, checkInterval, (hitResult) =>
-            {
-                Vector3Int positionRounded = Vector3Int.RoundToInt(hitResult.position);
-                WorldGenerationEngine.Instance.RegisterWorldChange(positionRounded, WorldGenerationEngine.Instance.blocks.GetEntryByName("air").GetDefaultBlockState());
-            });
+            if (isHitting)
+                WorldGenerationEngine.Instance.RegisterWorldChange(currentHitResult.GetRoundedPosition(), WorldGenerationEngine.Instance.blocks.GetEntryByName("air").GetDefaultBlockState());
         }
 
     }

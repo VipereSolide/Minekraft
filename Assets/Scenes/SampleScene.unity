@@ -802,9 +802,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ff0fb3b8728e214d96958e8d13077c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 2003425548}
   checkCount: 80
   checkInterval: 0.1
+  player: {fileID: 2003425548}
+  previewingBlockMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  previewingBlockMaterial: {fileID: 2100000, guid: 7535df638eefd0f42aa7ccbf7e5207cd,
+    type: 2}
+  isHitting: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -9,6 +9,16 @@ namespace com.rose.fundation
     {
         public Vector3 direction;
         public Vector3 position;
+
+        public Vector3Int GetRoundedPosition()
+        {
+            return Vector3Int.RoundToInt(position);
+        }
+
+        public Vector3Int GetRoundedDirection()
+        {
+            return Vector3Int.RoundToInt(direction);
+        }
     }
 
     public static class CameraUtility
