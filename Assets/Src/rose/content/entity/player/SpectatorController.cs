@@ -12,6 +12,11 @@ namespace com.rose.content.world.entity.player
 
         private float mouseY = 0;
 
+        private void Start()
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+
         private void Update()
         {
             void CameraRotation()
