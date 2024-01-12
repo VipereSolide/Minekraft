@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace com.rose.content.world.content.block
@@ -14,6 +15,14 @@ namespace com.rose.content.world.content.block
                     return entry;
 
             return null;
+        }
+
+        public BlockEntry GetEntry(BlockEntry blockEntry)
+        {
+            if (entries.Contains(blockEntry))
+                return blockEntry;
+
+            return entries[0];
         }
     }
 }

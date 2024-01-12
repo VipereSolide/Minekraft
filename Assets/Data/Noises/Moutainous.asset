@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f3d174e483486541953f0cd58a77cd5, type: 3}
-  m_Name: Noise
+  m_Name: Moutainous
   m_EditorClassIdentifier: 
   noiseType: 5
   rotationType3D: 2
-  seed: 2
+  seed: 409701927
   frequency: 0.011
   fractalType: 1
-  fractalOctaves: 4
-  fractalLacunarity: 3.73
-  fractalGain: 0.27
-  fractalWeightedStrength: 2.53
+  fractalOctaves: 5
+  fractalLacunarity: 2.5
+  fractalGain: 0.5
+  fractalWeightedStrength: 0
   domainWarpType: 0
   domainRotationType3D: 2
-  domainWarpAmplitude: 38.5
+  domainWarpAmplitude: 0

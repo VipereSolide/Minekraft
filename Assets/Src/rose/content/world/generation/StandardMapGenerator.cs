@@ -11,6 +11,13 @@ namespace com.rose.content.world.generation
         public NoiseSettings noiseSettings;
         public int maxHeight;
 
+        [Header("Palette")]
+        public BlockEntry surfaceBlock;
+        public BlockEntry subsurfaceBlock;
+        public BlockEntry[] stoneBlocks;
+
+        private Random random;
+
         public int GetSurfaceHeightFromGlobalPosition(Vector3Int position)
         {
             float noise = noiseSettings.Get().GetNoise(position.x, position.z);
@@ -25,21 +32,25 @@ namespace com.rose.content.world.generation
 
         private bool Chance(float percent)
         {
-            Random r = new();
-            return r.Next(101) < percent;
+            return random.Next(101) < percent;
         }
 
         public override BlockEntry GetBlockAtPosition(Vector3Int position, BlockMap map)
         {
+            random = new();
+
             int surface = GetSurfaceHeightFromGlobalPosition(position);
 
             if (position.y > surface)
                 return map.GetEntryByName("air");
 
-            if (position.y == surface && Chance(45))
-                return map.GetEntryByName("gravel");
+            if (position.y == surface)
+                return map.GetEntry(surfaceBlock);
 
-            return Chance(35) ? map.GetEntryByName("andesite") : map.GetEntryByName("stone");
+            if (position.y == surface - 1 || position.y == surface - 2 && Chance(37))
+                return map.GetEntry(subsurfaceBlock);
+
+            return map.GetEntry(stoneBlocks[random.Next(stoneBlocks.Length)]);
         }
     }
 }

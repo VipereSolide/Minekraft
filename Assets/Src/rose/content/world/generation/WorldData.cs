@@ -18,6 +18,6 @@ public static class WorldData
     /// <summary>
     /// Number of chunks rendered around the player.
     /// </summary>
-    public static int horizontalRenderDistance = 8;
+    public static int horizontalRenderDistance = 10;
     //public static int verticalRenderDistance = 2 * 16;
 }
