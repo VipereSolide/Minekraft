@@ -40,8 +40,11 @@ namespace com.rose.content.world.entity.player
             {
                 Matrix4x4 matrice = new();
 
-                matrice.SetTRS(currentHitResult.GetRoundedPosition() + currentHitResult.GetRoundedDirection(), Quaternion.identity, Vector3.one);
-                Graphics.DrawMesh(previewingBlockMesh, matrice, previewingPlaceBlockMaterial, 0);
+                if (WorldData.activateBlockPlaceIndicator)
+                {
+                    matrice.SetTRS(currentHitResult.GetRoundedPosition() + currentHitResult.GetRoundedDirection(), Quaternion.identity, Vector3.one);
+                    Graphics.DrawMesh(previewingBlockMesh, matrice, previewingPlaceBlockMaterial, 0);
+                }
 
                 matrice.SetTRS(currentHitResult.GetRoundedPosition(), Quaternion.identity, Vector3.one);
                 Graphics.DrawMesh(previewingBlockMesh, matrice, previewingDestroyBlockMaterial, 0);

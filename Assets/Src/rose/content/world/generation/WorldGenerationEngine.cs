@@ -3,7 +3,9 @@ using com.rose.content.world.entity.player;
 using com.rose.debugging.world.generation;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace com.rose.content.world.generation
 {
@@ -72,7 +74,7 @@ namespace com.rose.content.world.generation
             if (randomSeed)
                 generator.noiseSettings.seed = new System.Random().Next(int.MaxValue);
 
-            updateRoutine = new(5);
+            updateRoutine = new(WorldData.chunkUpdateRoutineWorkers);
             chunks = new Chunk[mapSize.x, mapSize.y, mapSize.z];
 
             for (int mapX = 0; mapX < mapSize.x; mapX++)
@@ -81,11 +83,13 @@ namespace com.rose.content.world.generation
                         chunks[mapX, mapY, mapZ] = new Chunk(this, new Vector3Int(mapX, mapY, mapZ));
         }
 
-        protected virtual void InitializeNearbyChunks()
+        protected virtual async void InitializeNearbyChunks()
         {
             foreach (var chunk in GetNearbyChunks())
+            {
                 if (!chunk.IsInitialized && ShouldChunkBeRendered(chunk))
-                    chunk.Initialize();
+                    await Task.Run(() => chunk.Initialize());
+            }
         }
 
         public virtual bool ShouldChunkBeRendered(Chunk chunk)

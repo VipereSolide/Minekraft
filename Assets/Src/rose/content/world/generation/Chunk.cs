@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using static WorldData;
+using Debug = UnityEngine.Debug;
 
 namespace com.rose.content.world.generation
 {
@@ -21,6 +22,7 @@ namespace com.rose.content.world.generation
         public bool shouldUpdate;
 
         public bool hasRenderedChunkOnce;
+        public bool hasPopulatedBlockStateMap;
 
         public bool IsInitialized
         {
@@ -41,12 +43,16 @@ namespace com.rose.content.world.generation
         public void Initialize()
         {
             isInitialized = true;
-
             PopulateBlockStates();
+
+            Debug.Log("Chunk initialized.");
         }
 
         public void PopulateBlockStates()
         {
+            if (hasPopulatedBlockStateMap)
+                return;
+
             blockstates = new BlockState[chunkSize.x, chunkSize.y, chunkSize.z];
 
             for (int x = 0; x < chunkSize.x; x++)
@@ -60,6 +66,8 @@ namespace com.rose.content.world.generation
                     }
                 }
             }
+
+            hasPopulatedBlockStateMap = true;
         }
 
 
@@ -68,6 +76,9 @@ namespace com.rose.content.world.generation
             void Update()
             {
                 cache = new();
+
+                if (!hasPopulatedBlockStateMap)
+                    PopulateBlockStates();
 
                 for (int x = 0; x < chunkSize.x; x++)
                 {
