@@ -238,7 +238,7 @@ namespace com.rose.content.world.generation
                     borderedChunks.Add(toAdd);
             }
 
-            if (localPosition.x == chunkSize.x)
+            if (localPosition.x == chunkSize.x - 1)
             {
                 Chunk toAdd = world.GetChunkFromCoordinate(coordinate + Vector3Int.right);
                 if (toAdd != null)
@@ -252,7 +252,7 @@ namespace com.rose.content.world.generation
                     borderedChunks.Add(toAdd);
             }
 
-            if (localPosition.y == chunkSize.y)
+            if (localPosition.y == chunkSize.y - 1)
             {
                 Chunk toAdd = world.GetChunkFromCoordinate(coordinate + Vector3Int.up);
                 if (toAdd != null)
@@ -266,7 +266,7 @@ namespace com.rose.content.world.generation
                     borderedChunks.Add(toAdd);
             }
 
-            if (localPosition.z == chunkSize.z)
+            if (localPosition.z == chunkSize.z - 1)
             {
                 Chunk toAdd = world.GetChunkFromCoordinate(coordinate + Vector3Int.forward);
                 if (toAdd != null)
