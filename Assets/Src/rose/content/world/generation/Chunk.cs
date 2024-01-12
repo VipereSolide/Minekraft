@@ -1,8 +1,8 @@
 using com.rose.content.world.content.block;
+using com.rose.debugging.world.generation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using UnityEngine;
 using static WorldData;
 using Debug = UnityEngine.Debug;
@@ -20,6 +20,8 @@ namespace com.rose.content.world.generation
 
         public BlockRenderData cache;
         public bool shouldUpdate;
+
+        public bool hasRenderedChunkOnce;
 
         public bool IsInitialized
         {
@@ -61,7 +63,8 @@ namespace com.rose.content.world.generation
             }
         }
 
-        public BlockRenderData GetRenderData()
+
+        public void ForceUpdateRenderDataCache()
         {
             void Update()
             {
@@ -80,27 +83,29 @@ namespace com.rose.content.world.generation
                 }
             }
 
+            var stopwatch = Stopwatch.StartNew();
+            Debug.Log("Updating chunk.");
+
+            Update();
+
+            stopwatch.Stop();
+            Debug.Log($"| Elapsed time:        {stopwatch.ElapsedMilliseconds}ms");
+            WorldGenerationDebugger.AddChunkLoadingResult(this, stopwatch.ElapsedMilliseconds);
+
+            hasRenderedChunkOnce = true;
+        }
+
+        public void UpdateRenderDataCache()
+        {
             if (shouldUpdate || cache == null)
             {
-                if (cache == null)
-                {
-                    var stopwatch = Stopwatch.StartNew();
-                    Debug.Log("Updating chunk asynchrounously.");
-
-                    Parallel.Invoke(Update);
-
-                    stopwatch.Stop();
-                    Debug.Log($"| Elapsed time:          {stopwatch.ElapsedMilliseconds}ms");
-                }
-                else
-                {
-                    Debug.Log("Updating chunk synchrounously...");
-                    Update();
-                }
-
+                ForceUpdateRenderDataCache();
                 shouldUpdate = false;
             }
+        }
 
+        public BlockRenderData GetRenderData()
+        {
             return cache;
         }
 

@@ -34,10 +34,10 @@ namespace com.rose.content.world.generation
             if (position.y > surface)
                 return map.GetEntryByName("air");
 
-            if (position.y == surface && Chance(75))
+            if (position.y == surface && Chance(45))
                 return map.GetEntryByName("gravel");
 
-            return Chance(5) ? map.GetEntryByName("andesite") : map.GetEntryByName("stone");
+            return Chance(35) ? map.GetEntryByName("andesite") : map.GetEntryByName("stone");
         }
     }
 }

@@ -1,6 +1,8 @@
 using com.rose.content.world.content.block;
+using com.rose.debugging.world.generation;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace com.rose.content.world.generation
@@ -35,12 +37,14 @@ namespace com.rose.content.world.generation
         private void Awake()
         {
             SetSingleton();
+            WorldGenerationDebugger.WorldGenerationEngineAwakens();
             Initialize();
         }
 
         private void Update()
         {
             InitializeNearbyChunks();
+            UpdateChunksRenderDataCache();
             Render();
         }
 
@@ -111,14 +115,50 @@ namespace com.rose.content.world.generation
             return frustumOcclusionCulling;
         }
 
+        protected virtual async void UpdateChunksRenderDataCache()
+        {
+            List<Task> tasks = new();
+
+            foreach (var chunk in chunks)
+            {
+                if (chunk.IsInitialized && ShouldChunkBeRendered(chunk))
+                {
+                    if (chunk.hasRenderedChunkOnce)
+                        chunk.UpdateRenderDataCache();
+                    else
+                        tasks.Add(new(() => chunk.UpdateRenderDataCache()));
+                }
+            }
+
+            foreach (var task in tasks)
+                task.Start();
+
+            await Task.WhenAll(tasks);
+        }
+
         protected virtual void Render()
         {
             foreach (var chunk in chunks)
             {
                 if (chunk.IsInitialized && ShouldChunkBeRendered(chunk))
                 {
-                    foreach (var key in chunk.GetRenderData().blocks)
+                    if (chunk.cache == null)
+                        continue;
+
+                    foreach (var key in chunk.cache.blocks)
                     {
+                        if (key == null)
+                        {
+                            Debug.LogWarning("CANNOT RENDER NULL KEY!");
+                            continue;
+                        }
+
+                        if (key.voxels == null)
+                        {
+                            Debug.LogWarning("CANNOT RENDER NULL VOXELS!");
+                            continue;
+                        }
+
                         Graphics.DrawMeshInstanced(faceMesh, 0, key.blockEntry.GetModifiedMaterial(faceBaseMaterial), key.voxels.ToArray());
                     }
                 }
