@@ -1,5 +1,5 @@
-using com.rose.content.world.content.block;
 using com.rose.content.world.generation;
+using com.rose.fundation;
 using UnityEngine;
 
 namespace com.rose.content.world.entity.player
@@ -14,6 +14,7 @@ namespace com.rose.content.world.entity.player
         private void Awake()
         {
             player.input.onAttack += OnAttack;
+            player.input.onUse += OnUse;
         }
 
         private void OnDrawGizmosSelected()
@@ -28,22 +29,25 @@ namespace com.rose.content.world.entity.player
             }
         }
 
+        private void OnUse()
+        {
+            CameraUtility.Raycast(transform.position, player.camera.transform.forward, checkCount, checkInterval, (hitResult) =>
+            {
+                Vector3Int dir = Vector3Int.RoundToInt(hitResult.direction);
+                Debug.Log(dir);
+                Vector3Int positionRounded = Vector3Int.RoundToInt(hitResult.position) + dir;
+                WorldGenerationEngine.Instance.RegisterWorldChange(positionRounded, WorldGenerationEngine.Instance.blocks.GetEntryByName("stone").GetDefaultBlockState());
+            });
+        }
+
         private void OnAttack()
         {
-            float nextCheckLength = 0;
-            for (int i = 0; i < checkCount; i++)
+            CameraUtility.Raycast(transform.position, player.camera.transform.forward, checkCount, checkInterval, (hitResult) =>
             {
-                nextCheckLength += checkInterval;
-                Vector3 position = transform.position + player.camera.transform.forward * nextCheckLength;
-                Vector3Int positionRounded = Vector3Int.RoundToInt(position);
-
-                BlockEntry blockAtPosition = WorldGenerationEngine.Instance.GetBlockState(positionRounded).entry;
-                if (blockAtPosition.name == "air")
-                    continue;
-
+                Vector3Int positionRounded = Vector3Int.RoundToInt(hitResult.position);
                 WorldGenerationEngine.Instance.RegisterWorldChange(positionRounded, WorldGenerationEngine.Instance.blocks.GetEntryByName("air").GetDefaultBlockState());
-                break;
-            }
+            });
         }
+
     }
 }
