@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace com.rose.content.world.generation
 {
+    [Serializable]
     public class ChunkUpdateRoutine
     {
         public Queue<Chunk> waitingList;
@@ -37,9 +40,20 @@ namespace com.rose.content.world.generation
             waitingList.Enqueue(chunk);
         }
 
-        protected virtual void SetUpdatingChunkAtIndex(Chunk chunk, int index)
+        protected virtual async void SetUpdatingChunkAtIndex(Chunk chunk, int index)
         {
             updatingChunks[index] = chunk;
+
+            await Task.Run(() =>
+            {
+                chunk.UpdateRenderDataCache();
+                FinishUpdatingChunkAtIndex(index);
+            });
+        }
+
+        protected virtual void FinishUpdatingChunkAtIndex(int index)
+        {
+            updatingChunks[index] = null;
         }
     }
 }

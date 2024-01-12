@@ -3,7 +3,6 @@ using com.rose.content.world.entity.player;
 using com.rose.debugging.world.generation;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace com.rose.content.world.generation
@@ -32,6 +31,7 @@ namespace com.rose.content.world.generation
         [Header("Runtime Data")]
         public StandardMapGenerator generator = new();
         public Chunk[,,] chunks;
+        public ChunkUpdateRoutine updateRoutine;
 
         public Plane[] planes;
 
@@ -47,6 +47,8 @@ namespace com.rose.content.world.generation
             InitializeNearbyChunks();
             UpdateChunksRenderDataCache();
             Render();
+
+            updateRoutine.UpdateWaitingList();
         }
 
         private void OnDrawGizmos()
@@ -66,13 +68,14 @@ namespace com.rose.content.world.generation
 
         private void Initialize()
         {
+            updateRoutine = new(5);
+
             chunks = new Chunk[mapSize.x, mapSize.y, mapSize.z];
 
             for (int mapX = 0; mapX < mapSize.x; mapX++)
                 for (int mapZ = 0; mapZ < mapSize.z; mapZ++)
                     for (int mapY = 0; mapY < mapSize.y; mapY++)
                         chunks[mapX, mapY, mapZ] = new Chunk(this, new Vector3Int(mapX, mapY, mapZ));
-            //a
         }
 
         protected virtual void InitializeNearbyChunks()
@@ -104,7 +107,8 @@ namespace com.rose.content.world.generation
                     }
                     else
                     {
-                        await Task.Run(() => chunk.UpdateRenderDataCache());
+                        //await Task.Run(() => chunk.UpdateRenderDataCache());
+                        updateRoutine.RegisterChunkUpdate(chunk);
                     }
                 }
             }
