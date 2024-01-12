@@ -42,6 +42,8 @@ namespace com.rose.content.world.generation
         {
             SetSingleton();
             WorldGenerationDebugger.WorldGenerationEngineAwakens();
+
+            player.transform.position = (mapSize * WorldData.chunkSize) / 2;
             Initialize();
         }
 
