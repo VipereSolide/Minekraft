@@ -66,32 +66,7 @@ namespace com.rose.content.world.generation
                 StartUpdatingCycle();
             }
 
-            if (isUpdatingCycleStarted)
-            {
-                // If we're initializing chunks
-                if (currentUpdatingCycleStep == 0)
-                {
-                    chunkInitializingRoutine.UpdateWaitingList();
-
-                    // That means it finished its tasks.
-                    if (chunkInitializingRoutine.IsFree())
-                    {
-                        AdvanceUpdatingCycleStep();
-                    }
-                }
-                // If we're updating the cache for the chunks for the first time.
-                else if (currentUpdatingCycleStep == 1)
-                {
-                    updateRoutine.UpdateWaitingList();
-
-                    // That means we created the cache for every initialized chunks.
-                    if (updateRoutine.IsFree())
-                    {
-                        AdvanceUpdatingCycleStep();
-                    }
-                }
-            }
-
+            UpdateUpdatingCycle();
             Render();
         }
 
@@ -132,6 +107,35 @@ namespace com.rose.content.world.generation
                         chunks[mapX, mapY, mapZ] = new Chunk(this, new Vector3Int(mapX, mapY, mapZ));
         }
 
+        private void UpdateUpdatingCycle()
+        {
+            if (isUpdatingCycleStarted)
+            {
+                // If we're initializing chunks
+                if (currentUpdatingCycleStep == 0)
+                {
+                    chunkInitializingRoutine.UpdateWaitingList();
+
+                    // That means it finished its tasks.
+                    if (chunkInitializingRoutine.IsFree())
+                    {
+                        AdvanceUpdatingCycleStep();
+                    }
+                }
+                // If we're updating the cache for the chunks for the first time.
+                else if (currentUpdatingCycleStep == 1)
+                {
+                    updateRoutine.UpdateWaitingList();
+
+                    // That means we created the cache for every initialized chunks.
+                    if (updateRoutine.IsFree())
+                    {
+                        AdvanceUpdatingCycleStep();
+                    }
+                }
+            }
+        }
+
         private void StartUpdatingCycle()
         {
             if (isUpdatingCycleStarted)
@@ -160,6 +164,9 @@ namespace com.rose.content.world.generation
                 Debug.Log("Creating cache for all newly initialized chunks...");
                 foreach (var chunk in currentUpdatingCycleChunks)
                 {
+                    if (chunk.hasRenderedChunkOnce)
+                        continue;
+
                     updateRoutine.RegisterChunkUpdate(chunk);
                 }
             }
