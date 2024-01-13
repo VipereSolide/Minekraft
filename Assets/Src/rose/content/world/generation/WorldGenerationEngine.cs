@@ -105,7 +105,7 @@ namespace com.rose.content.world.generation
             return GeometryUtility.TestPlanesAABB(planes, chunk.GetBounds());
         }
 
-        protected virtual async void UpdateChunksRenderDataCache()
+        protected virtual void UpdateChunksRenderDataCache()
         {
             foreach (var chunk in GetNearbyChunks())
             {
@@ -114,7 +114,7 @@ namespace com.rose.content.world.generation
                     if (chunk.hasRenderedChunkOnce)
                     {
                         // await Task.Run(() => chunk.UpdateRenderDataCache());
-                        chunk.UpdateRenderDataCache();
+                        // chunk.UpdateRenderDataCache();
                     }
                     else
                     {
