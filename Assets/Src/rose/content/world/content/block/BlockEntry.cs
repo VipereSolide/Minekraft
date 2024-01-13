@@ -11,6 +11,9 @@ namespace com.rose.content.world.content.block
             "block's faces.")]
         public bool isTransparent;
 
+        [Tooltip("Whether the block occludes faces with other transparent blocks.")]
+        public bool occludeFacesWithSameTypeNeighbours;
+
         [Header("Textures")]
         public Material main;
 

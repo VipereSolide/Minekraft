@@ -13,11 +13,11 @@ public static class WorldData
     /// <summary>
     /// Amount of chunks that can be treated at the same time.
     /// </summary>
-    public static int chunkUpdateRoutineWorkers = 7;
+    public static int chunkUpdateRoutineWorkers = 6;
 
     /// <summary>
     /// Number of chunks rendered around the player.
     /// </summary>
-    public static int horizontalRenderDistance = 10;
+    public static int horizontalRenderDistance = 8;
     //public static int verticalRenderDistance = 2 * 16;
 }

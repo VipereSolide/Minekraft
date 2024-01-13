@@ -129,13 +129,6 @@ namespace com.rose.content.world.generation
             if (blockAtPosition == null || blockAtPosition.name == "air")
                 return null;
 
-            /*
-            Cannot because unity external calls cannnot be called from somewhere else than the main thread
-            Vector3 directionTowardsCamera = (globalPosition - world.player.playerCamera.transform.position).normalized;
-            if (Vector3.Dot(directionTowardsCamera, world.player.playerCamera.transform.forward) < 0F)
-                return null;
-            */
-
             bool[] facesVisibleState = hasRenderedChunkOnce ? GetVisibleFacesAtPosition(localPosition) : GetVisibleFacesAtPositionUsingNaturalBlocks(localPosition);
             HashSet<Matrix4x4> renderedFaces = new(facesVisibleState.Length);
 
@@ -205,16 +198,43 @@ namespace com.rose.content.world.generation
             };
         }
 
-        public bool[] GetVisibleFacesWithNeighbours(BlockState[] neighbours)
+        public bool[] GetVisibleFacesWithNeighbours(BlockState[] neighbours, BlockEntry entry)
         {
             bool[] result = new bool[neighbours.Length];
 
             for (int i = 0; i < neighbours.Length; i++)
             {
                 if (neighbours[i] == null)
+                {
                     result[i] = false;
+                    continue;
+                }
+
+                bool neighbourIsTransparent = neighbours[i].entry.isTransparent;
+                bool entryIsTransparent = entry.isTransparent;
+
+                if (neighbourIsTransparent)
+                {
+                    if (entryIsTransparent)
+                    {
+                        if (neighbours[i].entry == entry)
+                        {
+                            result[i] = false;
+                        }
+                        else
+                        {
+                            result[i] = true;
+                        }
+                    }
+                    else
+                    {
+                        result[i] = true;
+                    }
+                }
                 else
-                    result[i] = neighbours[i].entry.isTransparent;
+                {
+                    result[i] = false;
+                }
             }
 
             return result;
@@ -229,7 +249,8 @@ namespace com.rose.content.world.generation
         {
             Vector3Int globalPosition = GetGlobalPositionFromLocalPosition(localPosition);
             var neighbours = GetBlockStateNeighbours(globalPosition);
-            return GetVisibleFacesWithNeighbours(neighbours);
+
+            return GetVisibleFacesWithNeighbours(neighbours, GetBlockState(localPosition).entry);
         }
 
         /// <summary>
@@ -241,7 +262,8 @@ namespace com.rose.content.world.generation
         {
             Vector3Int globalPosition = GetGlobalPositionFromLocalPosition(localPosition);
             var neighbours = GetNaturalBlockStateNeighbours(globalPosition);
-            return GetVisibleFacesWithNeighbours(neighbours);
+
+            return GetVisibleFacesWithNeighbours(neighbours, GetBlockState(localPosition).entry);
         }
 
         public Vector3 GetDirectionFromNeighbourIndex(int neighbourIndex)

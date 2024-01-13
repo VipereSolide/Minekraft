@@ -68,7 +68,7 @@ namespace com.rose.content.world.entity.player
             if (isHitting)
             {
                 Vector3Int positionRounded = currentHitResult.GetRoundedPosition() + currentHitResult.GetRoundedDirection();
-                WorldGenerationEngine.Instance.RegisterWorldChange(positionRounded, WorldGenerationEngine.Instance.blocks.GetEntryByName("stone").GetDefaultBlockState());
+                WorldGenerationEngine.Instance.RegisterWorldChange(positionRounded, WorldGenerationEngine.Instance.blocks.GetEntryByName("glass").GetDefaultBlockState());
             }
         }
 
