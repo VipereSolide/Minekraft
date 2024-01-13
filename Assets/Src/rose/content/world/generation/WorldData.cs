@@ -8,7 +8,7 @@ public static class WorldData
     /// <summary>
     /// Whether the block placing indicator (green one) should be active or not.
     /// </summary>
-    public static readonly bool activateBlockPlaceIndicator = false;
+    public static readonly bool activateBlockPlaceIndicator = true;
 
     /// <summary>
     /// Amount of chunks that can be treated at the same time.
