@@ -2004,6 +2004,8 @@ MonoBehaviour:
   moveBackward: 115
   movementX: 0
   movementZ: 0
+  isAttackHeld: 0
+  isUseHeld: 0
 --- !u!114 &2003425548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2034,6 +2036,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   checkCount: 80
   checkInterval: 0.1
+  blocksPlacedPerMinute: 400
+  blocksBrokenPerMinute: 500
   player: {fileID: 2003425548}
   previewingBlockMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   previewingDestroyBlockMaterial: {fileID: 2100000, guid: f954610332798234ca90202f5ad7cbc9,

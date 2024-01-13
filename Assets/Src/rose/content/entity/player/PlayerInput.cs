@@ -22,6 +22,9 @@ namespace com.rose.content.world.entity.player
         public Action onAttack;
         public Action onUse;
 
+        public bool isAttackHeld;
+        public bool isUseHeld;
+
         public Vector2 Movement
         {
             get { return new(movementX, movementZ); }
@@ -55,6 +58,9 @@ namespace com.rose.content.world.entity.player
                     onAttack?.Invoke();
                 if (Input.GetKeyDown(use))
                     onUse?.Invoke();
+
+                isAttackHeld = Input.GetKey(attack);
+                isUseHeld = Input.GetKey(use);
             }
 
             Movement();
