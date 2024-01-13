@@ -8,6 +8,8 @@ namespace com.rose.content.world.entity.player
         public static Player Instance { get; private set; }
 
         public PlayerInput input;
+        public PlayerInteractivity interactivity;
+        public PlayerGui gui;
         public Camera playerCamera;
 
         private void Awake()

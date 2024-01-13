@@ -1,3 +1,4 @@
+using com.rose.content.world.content.block;
 using com.rose.content.world.generation;
 using com.rose.fundation;
 using UnityEngine;
@@ -67,8 +68,12 @@ namespace com.rose.content.world.entity.player
         {
             if (isHitting)
             {
+                BlockEntry entry = player.gui.hotbar.GetSelectedSlot().content;
+                if (entry == null)
+                    return;
+
                 Vector3Int positionRounded = currentHitResult.GetRoundedPosition() + currentHitResult.GetRoundedDirection();
-                WorldGenerationEngine.Instance.RegisterWorldChange(positionRounded, WorldGenerationEngine.Instance.blocks.GetEntryByName("glass").GetDefaultBlockState());
+                WorldGenerationEngine.Instance.RegisterWorldChange(positionRounded, entry.GetDefaultBlockState());
             }
         }
 
