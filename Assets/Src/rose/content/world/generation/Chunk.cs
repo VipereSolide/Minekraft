@@ -214,27 +214,14 @@ namespace com.rose.content.world.generation
                 bool entryIsTransparent = entry.isTransparent;
 
                 if (neighbourIsTransparent)
-                {
                     if (entryIsTransparent)
-                    {
                         if (neighbours[i].entry == entry)
                         {
-                            result[i] = false;
+                            result[i] = entry.occludeFacesWithSameTypeNeighbours;
+                            continue;
                         }
-                        else
-                        {
-                            result[i] = true;
-                        }
-                    }
-                    else
-                    {
-                        result[i] = true;
-                    }
-                }
-                else
-                {
-                    result[i] = false;
-                }
+
+                result[i] = neighbourIsTransparent;
             }
 
             return result;
