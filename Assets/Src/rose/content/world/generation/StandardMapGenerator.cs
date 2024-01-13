@@ -67,7 +67,7 @@ namespace com.rose.content.world.generation
             BlockEntry surfaceBlock = this.surfaceBlock;
             BlockEntry subsurfaceBlock = this.subsurfaceBlock;
 
-            if (position.y >= 120 + random.Next(-2, 2))
+            if (position.y >= 120 + random.Next(-10, 10))
             {
                 surfaceBlock = map.GetEntryByName("snow");
                 subsurfaceBlock = map.GetEntryByName("snow");

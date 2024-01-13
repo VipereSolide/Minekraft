@@ -1,4 +1,5 @@
 using com.rose.content.world.generation;
+using TMPro;
 using UnityEngine;
 
 namespace com.rose.debugging.world.generation
@@ -10,6 +11,7 @@ namespace com.rose.debugging.world.generation
         private static bool isStarted = false;
         public static bool showChunkBorders = false;
 
+        public TMP_Text routinesText;
         public long totalChunkLoadingTime = 0;
 
         private void Awake()
@@ -19,13 +21,16 @@ namespace com.rose.debugging.world.generation
 
         private void Update()
         {
+            var gen = WorldGenerationEngine.Instance;
+            routinesText.text = $"Chunk initialisation: {(gen.chunkInitializingRoutine.IsFree() ? "FREE" : $"{gen.chunkInitializingRoutine.waitingList.Count} left")}\nChunk cache: {(gen.updateRoutine.IsFree() ? "FREE" : $"{gen.updateRoutine.waitingList.Count} left")}";
+
             if (Input.GetKey(KeyCode.Quote))
             {
                 if (Input.GetKeyDown(KeyCode.R))
                 {
-                    foreach (var chunk in WorldGenerationEngine.Instance.chunks)
+                    foreach (var chunk in gen.chunks)
                     {
-                        if (!WorldGenerationEngine.Instance.ShouldChunkBeRendered(chunk))
+                        if (!gen.ShouldChunkBeRendered(chunk))
                             continue;
 
                         chunk.shouldUpdate = true;
@@ -37,7 +42,7 @@ namespace com.rose.debugging.world.generation
 
                 if (Input.GetKeyDown(KeyCode.L))
                 {
-                    var routine = WorldGenerationEngine.Instance.updateRoutine;
+                    var routine = gen.updateRoutine;
                     Debug.Log($"Routine list size: {routine.waitingList.Count}");
                     Debug.Log($"Routine updating chunks state:");
 
