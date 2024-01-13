@@ -301,7 +301,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 48}
+  m_AnchoredPosition: {x: 0, y: -96}
   m_SizeDelta: {x: 728, y: 88}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &216963338
@@ -323,7 +323,7 @@ MonoBehaviour:
   - content: {fileID: 11400000, guid: 32c06bf65cba4be4e82c94218791d241, type: 2}
   - content: {fileID: 11400000, guid: 35051ad50c7dcf04f91a7b6bb5fd7593, type: 2}
   - content: {fileID: 11400000, guid: f9042b655a32120429b43171b896a20a, type: 2}
-  - content: {fileID: 0}
+  - content: {fileID: 11400000, guid: 0ea17ebcde04b844f99c6b5e2d355b1d, type: 2}
   - content: {fileID: 0}
   - content: {fileID: 0}
   selectedSlot: 0
@@ -2057,6 +2057,13 @@ MonoBehaviour:
   crosshairCanvasGroup: {fileID: 893268723}
   crosshairVisibilityLerpTime: 7
   hotbar: {fileID: 216963338}
+  hotbarRect: {fileID: 216963337}
+  hotbarLifetime: 6
+  hotbarLerpSpeed: 1200
+  hotbarOutPosition: 48
+  hotbarInPosition: -96
+  isHotbarVisible: 0
+  currentHotbarLifetime: 0
 --- !u!1 &2042270186
 GameObject:
   m_ObjectHideFlags: 0

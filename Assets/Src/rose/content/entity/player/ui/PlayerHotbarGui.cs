@@ -1,4 +1,5 @@
 using com.rose.fundation.ui;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,11 +10,14 @@ namespace com.rose.content.world.entity.player.ui
         public Slot[] slots = new Slot[9];
         public int selectedSlot = 0;
 
-        [Header("Resources")]
+        /// <summary>
+        /// Called whenever the hotbar selects a new slot. The int represents the previously selected slot index.
+        /// </summary>
+        public Action<int> onSelectSlot;
 
+        [Header("Resources")]
         public RectTransform hotbarSlotIndicator;
         public float slotSize;
-
         public RawImage[] slotImages;
 
         private void Start()
@@ -72,24 +76,29 @@ namespace com.rose.content.world.entity.player.ui
 
         public void NextSlot()
         {
+            int previousSelectedSlot = selectedSlot;
             selectedSlot++;
             if (selectedSlot >= slots.Length)
                 selectedSlot = 0;
+            onSelectSlot?.Invoke(previousSelectedSlot);
 
             UpdateUI();
         }
 
         public void PreviousSlot()
         {
+            int previousSelectedSlot = selectedSlot;
             selectedSlot--;
             if (selectedSlot < 0)
                 selectedSlot = slots.Length - 1;
+            onSelectSlot?.Invoke(previousSelectedSlot);
 
             UpdateUI();
         }
 
         public void SelectSlot(int slotIndex)
         {
+            onSelectSlot?.Invoke(selectedSlot);
             selectedSlot = slotIndex;
             UpdateUI();
         }
