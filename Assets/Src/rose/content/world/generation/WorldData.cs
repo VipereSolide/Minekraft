@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class WorldData
 {
-    public static readonly Vector3Int chunkSize = new(32, 32, 32);
+    public static readonly Vector3Int chunkSize = new(16, 16, 16);
     public static readonly int textureSize = 16;
 
     /// <summary>
@@ -20,10 +20,10 @@ public static class WorldData
     /// The render distance is only what chunks are visually rendered, while the generationDistance is what chunks are being generated (populate
     /// block map, first cache update).
     /// </summary>
-    public static int renderDistance = 10;
+    public static int renderDistance = 20;
 
     /// <summary>
     /// Maximum distance after which chunks do not generate around the player position.
     /// </summary>
-    public static int generationDistance = 2;
+    public static int generationDistance = 4;
 }

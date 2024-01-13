@@ -95,6 +95,21 @@ namespace com.rose.content.world.generation
             Render();
         }
 
+        private void OnDrawGizmos()
+        {
+            if (!WorldGenerationDebugger.showChunkBorders)
+                return;
+
+            foreach (var chunk in GetNearbyChunks(player.GetGlobalPosition(), 3))
+            {
+                if (!ShouldChunkBeRendered(chunk))
+                    continue;
+
+                Gizmos.color = (chunk.Coordinate == player.GetChunkCoordinate()) ? new Color(1, 0.5F, 0.25F, 1) : Gizmos.color = new Color(1, 1, 1, 0.05F);
+                Gizmos.DrawWireCube(chunk.GetBounds().center, chunk.GetBounds().size);
+            }
+        }
+
         private void Initialize()
         {
             if (randomSeed)
@@ -169,21 +184,6 @@ namespace com.rose.content.world.generation
             }
 
             chunkInitializingRoutine.SetTargetCount(currentUpdatingCycleChunks.Count);
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (!WorldGenerationDebugger.showChunkBorders)
-                return;
-
-            foreach (var chunk in GetNearbyChunks(player.GetGlobalPosition(), 3))
-            {
-                if (!ShouldChunkBeRendered(chunk))
-                    continue;
-
-                Gizmos.color = (chunk.Coordinate == player.GetChunkCoordinate()) ? new Color(1, 0.5F, 0.25F, 1) : Gizmos.color = new Color(1, 1, 1, 0.05F);
-                Gizmos.DrawWireCube(chunk.GetBounds().center, chunk.GetBounds().size);
-            }
         }
 
         protected virtual async void InitializeNearbyChunks()
@@ -293,7 +293,9 @@ namespace com.rose.content.world.generation
 
         public void RegisterWorldChange(Vector3Int globalPosition, BlockState newState, bool updateFlag = true)
         {
-            GetChunkFromGlobalPosition(globalPosition).SetBlockState(GetChunkLocalPositionFromGlobalPosition(globalPosition), newState, updateFlag);
+            var chunk = GetChunkFromGlobalPosition(globalPosition);
+            chunk.SetBlockState(GetChunkLocalPositionFromGlobalPosition(globalPosition), newState, updateFlag);
+            chunk.ForceUpdateRenderDataCache();
         }
 
         public Chunk[] AllChunks()
