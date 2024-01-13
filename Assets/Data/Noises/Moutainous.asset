@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noiseType: 5
   rotationType3D: 2
-  seed: 1606032977
-  frequency: 0.011
+  seed: 309098303
+  frequency: 0.005
   fractalType: 1
   fractalOctaves: 5
   fractalLacunarity: 2.5
