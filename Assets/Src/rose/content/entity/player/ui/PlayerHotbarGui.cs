@@ -38,7 +38,7 @@ namespace com.rose.content.world.entity.player.ui
                 }
 
                 slotImages[i].color = Color.white;
-                slotImages[i].texture = slots[i].content.main.mainTexture;
+                slotImages[i].texture = slots[i].content.useMainMaterial ? slots[i].content.main.mainTexture : slots[i].content.textures[0].mainTexture;
             }
         }
 

@@ -32,15 +32,37 @@ namespace com.rose.content.world.generation
         public class BlockKey
         {
             public BlockEntry blockEntry;
-            public HashSet<Matrix4x4> voxels;
+            public HashSet<FaceData> voxels;
 
-            public BlockKey(BlockEntry blockEntry, HashSet<Matrix4x4> voxels)
+            /// <summary>
+            /// Sorts every voxel into a 'Matrix For Face' array, where every item of the array corresponds to a face, and the corresponding HashMap contains every Matrices.
+            /// </summary>
+            /// <returns>
+            /// A Array of HashSets of Matrices. The Matrices are the rendered data. The HashSets contain all the different faces and their render data. The array corresponds
+            /// to the 6 faces.
+            /// </returns>
+            public HashSet<Matrix4x4>[] GetVoxelData()
+            {
+                HashSet<Matrix4x4>[] result = new HashSet<Matrix4x4>[6];
+
+                foreach (var faceData in voxels)
+                {
+                    if (result[faceData.faceIndex] == null)
+                        result[faceData.faceIndex] = new();
+
+                    result[faceData.faceIndex].Add(faceData.face);
+                }
+
+                return result;
+            }
+
+            public BlockKey(BlockEntry blockEntry, HashSet<FaceData> voxels)
             {
                 this.blockEntry = blockEntry;
                 this.voxels = voxels;
             }
 
-            public BlockKey(Tuple<BlockEntry, HashSet<Matrix4x4>> tuple)
+            public BlockKey(Tuple<BlockEntry, HashSet<FaceData>> tuple)
             {
                 blockEntry = tuple.Item1;
                 voxels = tuple.Item2;
@@ -58,7 +80,7 @@ namespace com.rose.content.world.generation
     {
         public RenderedBlockCollection blocks = new();
 
-        public void Add(Tuple<BlockEntry, HashSet<Matrix4x4>> data)
+        public void Add(Tuple<BlockEntry, HashSet<FaceData>> data)
         {
             if (data == null)
                 return;
@@ -69,7 +91,7 @@ namespace com.rose.content.world.generation
                 blocks.Add(new(data));
         }
 
-        public void Add(Tuple<BlockEntry, Matrix4x4[]> data)
+        public void Add(Tuple<BlockEntry, FaceData[]> data)
         {
             if (data == null)
                 return;

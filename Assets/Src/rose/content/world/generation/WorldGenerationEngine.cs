@@ -177,7 +177,14 @@ namespace com.rose.content.world.generation
                             continue;
                         }
 
-                        Graphics.DrawMeshInstanced(faceMesh, 0, key.blockEntry.GetModifiedMaterial(faceBaseMaterial), key.voxels.ToArray());
+                        HashSet<Matrix4x4>[] faceData = key.GetVoxelData();
+                        for (byte i = 0; i < faceData.Length; i++)
+                        {
+                            if (faceData[i] == null)
+                                continue;
+
+                            Graphics.DrawMeshInstanced(faceMesh, 0, key.blockEntry.GetModifiedMaterial(faceBaseMaterial, i), faceData[i].ToArray());
+                        }
                     }
                 }
             }

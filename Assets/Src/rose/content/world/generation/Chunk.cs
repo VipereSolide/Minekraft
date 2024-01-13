@@ -9,6 +9,12 @@ using Debug = UnityEngine.Debug;
 
 namespace com.rose.content.world.generation
 {
+    public struct FaceData
+    {
+        public Matrix4x4 face;
+        public byte faceIndex;
+    }
+
     [Serializable]
     public class Chunk
     {
@@ -120,7 +126,7 @@ namespace com.rose.content.world.generation
         }
 
         /// <param name="localPosition">Position of the block inside the chunk (I.e. 1, 8, 31)</param>
-        protected virtual Tuple<BlockEntry, HashSet<Matrix4x4>> GetRenderDataAtPosition(Vector3Int localPosition)
+        protected virtual Tuple<BlockEntry, HashSet<FaceData>> GetRenderDataAtPosition(Vector3Int localPosition)
         {
             // The rendered position's coordinates in global space instead of chunk space.
             Vector3Int globalPosition = GetGlobalPositionFromLocalPosition(localPosition);
@@ -130,16 +136,16 @@ namespace com.rose.content.world.generation
                 return null;
 
             bool[] facesVisibleState = hasRenderedChunkOnce ? GetVisibleFacesAtPosition(localPosition) : GetVisibleFacesAtPositionUsingNaturalBlocks(localPosition);
-            HashSet<Matrix4x4> renderedFaces = new(facesVisibleState.Length);
+            HashSet<FaceData> renderedFaces = new(facesVisibleState.Length);
 
             for (int i = 0; i < facesVisibleState.Length; i++)
                 if (facesVisibleState[i])
                     renderedFaces.Add(GetRenderedFace(globalPosition, i));
 
-            return new Tuple<BlockEntry, HashSet<Matrix4x4>>(blockAtPosition, renderedFaces);
+            return new Tuple<BlockEntry, HashSet<FaceData>>(blockAtPosition, renderedFaces);
         }
 
-        public Matrix4x4 GetRenderedFace(Vector3Int globalPosition, int faceIndex)
+        public FaceData GetRenderedFace(Vector3Int globalPosition, int faceIndex)
         {
             Matrix4x4 renderedFace = new();
             Vector3 offsetFromNeighbourIndex = GetOffsetFromNeighbourIndex(faceIndex);
@@ -147,7 +153,7 @@ namespace com.rose.content.world.generation
             Quaternion rotation = Quaternion.LookRotation(-GetDirectionFromNeighbourIndex(faceIndex));
             renderedFace.SetTRS(position, rotation, Vector3.one);
 
-            return renderedFace;
+            return new() { face = renderedFace, faceIndex = (byte) faceIndex };
         }
 
         public Vector3Int GetChunkGlobalCoordinate()

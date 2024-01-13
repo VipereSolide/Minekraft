@@ -324,7 +324,7 @@ MonoBehaviour:
   - content: {fileID: 11400000, guid: 35051ad50c7dcf04f91a7b6bb5fd7593, type: 2}
   - content: {fileID: 11400000, guid: f9042b655a32120429b43171b896a20a, type: 2}
   - content: {fileID: 11400000, guid: 0ea17ebcde04b844f99c6b5e2d355b1d, type: 2}
-  - content: {fileID: 0}
+  - content: {fileID: 11400000, guid: cde8f6052bf94ce43897182db45a413a, type: 2}
   - content: {fileID: 0}
   selectedSlot: 0
   hotbarSlotIndicator: {fileID: 1114948458}

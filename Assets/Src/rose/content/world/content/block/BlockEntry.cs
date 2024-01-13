@@ -15,11 +15,16 @@ namespace com.rose.content.world.content.block
         public bool occludeFacesWithSameTypeNeighbours;
 
         [Header("Textures")]
+        public bool useMainMaterial = true;
         public Material main;
 
-        public Material GetModifiedMaterial(Material material)
+        [Space]
+
+        public Material[] textures;
+
+        public Material GetModifiedMaterial(Material material, byte face)
         {
-            return main == null ? material : main;
+            return useMainMaterial ? (main == null ? material : main) : textures[face];
         }
 
         public BlockState GetDefaultBlockState()
