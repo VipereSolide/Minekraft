@@ -37,6 +37,17 @@ namespace com.rose.content.world.generation
 
         public Plane[] planes;
 
+        public ChunkInitializingRoutine chunkInitializingRoutine;
+        public byte currentUpdatingCycleStep;
+        public List<Chunk> currentUpdatingCycleChunks = new();
+
+        private bool isUpdatingCycleStarted;
+
+        public bool IsUpdatingCycleStarted
+        {
+            get { return isUpdatingCycleStarted; }
+        }
+
         private void Awake()
         {
             SetSingleton();
@@ -44,16 +55,120 @@ namespace com.rose.content.world.generation
 
             player.transform.position = (mapSize * WorldData.chunkSize) / 2;
             player.transform.position = player.transform.position.WithY(generator.GetSurfaceHeightFromGlobalPosition(player.GetGlobalPosition()) + 2);
+
             Initialize();
         }
 
         private void Update()
         {
-            InitializeNearbyChunks();
-            UpdateChunksRenderDataCache();
-            Render();
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                StartUpdatingCycle();
+            }
 
-            updateRoutine.UpdateWaitingList();
+            if (isUpdatingCycleStarted)
+            {
+                // If we're initializing chunks
+                if (currentUpdatingCycleStep == 0)
+                {
+                    chunkInitializingRoutine.UpdateWaitingList();
+
+                    // That means it finished its tasks.
+                    if (chunkInitializingRoutine.IsFree())
+                    {
+                        AdvanceUpdatingCycleStep();
+                    }
+                }
+                // If we're updating the cache for the chunks for the first time.
+                else if (currentUpdatingCycleStep == 1)
+                {
+                    updateRoutine.UpdateWaitingList();
+
+                    // That means we created the cache for every initialized chunks.
+                    if (updateRoutine.IsFree())
+                    {
+                        AdvanceUpdatingCycleStep();
+                    }
+                }
+            }
+
+            Render();
+        }
+
+        private void Initialize()
+        {
+            if (randomSeed)
+                foreach (var noiseSetting in generator.noiseSettings)
+                    noiseSetting.seed = new System.Random().Next(int.MaxValue);
+
+            updateRoutine = new(WorldData.chunkUpdateRoutineWorkers);
+            chunkInitializingRoutine = new(10);
+
+            InitializeChunkMap();
+        }
+
+        private void InitializeChunkMap()
+        {
+            chunks = new Chunk[mapSize.x, mapSize.y, mapSize.z];
+
+            for (int mapX = 0; mapX < mapSize.x; mapX++)
+                for (int mapZ = 0; mapZ < mapSize.z; mapZ++)
+                    for (int mapY = 0; mapY < mapSize.y; mapY++)
+                        chunks[mapX, mapY, mapZ] = new Chunk(this, new Vector3Int(mapX, mapY, mapZ));
+        }
+
+        private void StartUpdatingCycle()
+        {
+            if (isUpdatingCycleStarted)
+            {
+                Debug.LogError("Cannot start an updating cycle while one is already started!");
+                return;
+            }
+
+            isUpdatingCycleStarted = true;
+
+            InitializeAllSurroundingChunks();
+        }
+
+        private void StopUpdatingCycle()
+        {
+            isUpdatingCycleStarted = false;
+            Debug.Log("Finished updating cycle.");
+        }
+
+        private void AdvanceUpdatingCycleStep()
+        {
+            currentUpdatingCycleStep++;
+
+            if (currentUpdatingCycleStep == 1)
+            {
+                Debug.Log("Creating cache for all newly initialized chunks...");
+                foreach (var chunk in currentUpdatingCycleChunks)
+                {
+                    updateRoutine.RegisterChunkUpdate(chunk);
+                }
+            }
+            else
+            {
+                StopUpdatingCycle();
+            }
+        }
+
+        private void InitializeAllSurroundingChunks()
+        {
+            Debug.Log("Initializing all surrounding chunks...");
+            currentUpdatingCycleStep = 0;
+
+            foreach (var chunk in GetNearbyChunks())
+            {
+                if (!chunk.IsInitialized)
+                {
+                    chunkInitializingRoutine.RegisterChunkUpdate(chunk);
+                    currentUpdatingCycleChunks.Add(chunk);
+                }
+            }
+
+            chunkInitializingRoutine.SetTargetCount(currentUpdatingCycleChunks.Count);
         }
 
         private void OnDrawGizmos()
@@ -69,21 +184,6 @@ namespace com.rose.content.world.generation
                 Gizmos.color = (chunk.Coordinate == player.GetChunkCoordinate()) ? new Color(1, 0.5F, 0.25F, 1) : Gizmos.color = new Color(1, 1, 1, 0.05F);
                 Gizmos.DrawWireCube(chunk.GetBounds().center, chunk.GetBounds().size);
             }
-        }
-
-        private void Initialize()
-        {
-            if (randomSeed)
-                foreach (var noiseSetting in generator.noiseSettings)
-                    noiseSetting.seed = new System.Random().Next(int.MaxValue);
-
-            updateRoutine = new(WorldData.chunkUpdateRoutineWorkers);
-            chunks = new Chunk[mapSize.x, mapSize.y, mapSize.z];
-
-            for (int mapX = 0; mapX < mapSize.x; mapX++)
-                for (int mapZ = 0; mapZ < mapSize.z; mapZ++)
-                    for (int mapY = 0; mapY < mapSize.y; mapY++)
-                        chunks[mapX, mapY, mapZ] = new Chunk(this, new Vector3Int(mapX, mapY, mapZ));
         }
 
         protected virtual async void InitializeNearbyChunks()
@@ -114,7 +214,7 @@ namespace com.rose.content.world.generation
                     if (chunk.hasRenderedChunkOnce)
                     {
                         // await Task.Run(() => chunk.UpdateRenderDataCache());
-                        // chunk.UpdateRenderDataCache();
+                        chunk.UpdateRenderDataCache();
                     }
                     else
                     {

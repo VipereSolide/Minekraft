@@ -1,59 +1,27 @@
+using com.rose.fundation;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using UnityEngine;
 
 namespace com.rose.content.world.generation
 {
     [Serializable]
-    public class ChunkUpdateRoutine
+    public class ChunkUpdateRoutine : UpdateRoutine
     {
-        public Queue<Chunk> waitingList;
-        public Chunk[] updatingChunks;
-        public readonly int capacity;
-
-        public ChunkUpdateRoutine(int capacity)
+        public ChunkUpdateRoutine(int capacity) : base(capacity)
         {
-            this.capacity = capacity;
-            updatingChunks = new Chunk[capacity];
-            waitingList = new();
+
         }
 
-        public void UpdateWaitingList()
+        protected override void DoOnChunk(Chunk chunk, int index)
         {
-            if (waitingList.Count > 0)
-                for (int i = 0; i < capacity; i++)
-                    if (updatingChunks[i] == null)
-                        SetUpdatingChunkAtIndex(waitingList.Dequeue(), i);
+            chunk.UpdateRenderDataCache();
         }
 
-        public void RegisterChunkUpdate(Chunk chunk)
+        protected override void FinishUpdatingChunkAtIndex(int index)
         {
-            for (int i = 0; i < capacity; i++)
-            {
-                if (updatingChunks[i] == null)
-                {
-                    SetUpdatingChunkAtIndex(chunk, i);
-                    return;
-                }
-            }
+            base.FinishUpdatingChunkAtIndex(index);
 
-            waitingList.Enqueue(chunk);
-        }
-
-        protected virtual async void SetUpdatingChunkAtIndex(Chunk chunk, int index)
-        {
-            updatingChunks[index] = chunk;
-
-            await Task.Run(() =>
-            {
-                chunk.UpdateRenderDataCache();
-                FinishUpdatingChunkAtIndex(index);
-            });
-        }
-
-        protected virtual void FinishUpdatingChunkAtIndex(int index)
-        {
-            updatingChunks[index] = null;
+            Debug.Log($"ChunkUpdateRoutine: Worker {index} done ({waitingList.Count} left).");
         }
     }
 }

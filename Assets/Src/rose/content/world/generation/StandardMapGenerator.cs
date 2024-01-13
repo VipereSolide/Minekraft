@@ -63,14 +63,18 @@ namespace com.rose.content.world.generation
 
             if (position.y > surface)
                 return map.GetEntryByName("air");
-            return map.GetEntryByName("stone");
 
-            BlockEntry _surface = surfaceBlock;
-            if (position.y >= 60)
-                _surface = map.GetEntryByName("snow");
+            BlockEntry surfaceBlock = this.surfaceBlock;
+            BlockEntry subsurfaceBlock = this.subsurfaceBlock;
+
+            if (position.y >= 120 + random.Next(-2, 2))
+            {
+                surfaceBlock = map.GetEntryByName("snow");
+                subsurfaceBlock = map.GetEntryByName("snow");
+            }
 
             if (position.y == surface)
-                return map.GetEntry(_surface);
+                return map.GetEntry(surfaceBlock);
 
             if (position.y == surface - 1 || position.y == surface - 2 && Chance(37))
                 return map.GetEntry(subsurfaceBlock);

@@ -25,5 +25,5 @@ public static class WorldData
     /// <summary>
     /// Maximum distance after which chunks do not generate around the player position.
     /// </summary>
-    public static int generationDistance = 4;
+    public static int generationDistance = 2;
 }
