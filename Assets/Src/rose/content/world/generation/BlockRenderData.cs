@@ -41,16 +41,16 @@ namespace com.rose.content.world.generation
             /// A Array of HashSets of Matrices. The Matrices are the rendered data. The HashSets contain all the different faces and their render data. The array corresponds
             /// to the 6 faces.
             /// </returns>
-            public HashSet<Matrix4x4>[] GetVoxelData()
+            public Queue<Matrix4x4>[] GetVoxelData()
             {
-                HashSet<Matrix4x4>[] result = new HashSet<Matrix4x4>[6];
+                Queue<Matrix4x4>[] result = new Queue<Matrix4x4>[6];
 
                 foreach (var faceData in voxels)
                 {
                     if (result[faceData.textureIndex] == null)
-                        result[faceData.textureIndex] = new();
+                        result[faceData.textureIndex] = new Queue<Matrix4x4>();
 
-                    result[faceData.textureIndex].Add(faceData.face);
+                    result[faceData.textureIndex].Enqueue(faceData.face);
                 }
 
                 return result;
@@ -89,17 +89,6 @@ namespace com.rose.content.world.generation
                 blocks[data.Item1].voxels.AddRange(data.Item2);
             else
                 blocks.Add(new(data));
-        }
-
-        public void Add(Tuple<BlockEntry, FaceData[]> data)
-        {
-            if (data == null)
-                return;
-
-            if (blocks.Contains(data.Item1))
-                blocks[data.Item1].voxels.AddRange(data.Item2);
-            else
-                blocks.Add(new(data.Item1, data.Item2.ToHashSet()));
         }
     }
 }

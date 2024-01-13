@@ -2,7 +2,6 @@ using com.rose.content.world.content.block;
 using com.rose.content.world.entity.player;
 using com.rose.debugging.world.generation;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -176,7 +175,7 @@ namespace com.rose.content.world.generation
                             continue;
                         }
 
-                        HashSet<Matrix4x4>[] faceData = key.GetVoxelData();
+                        Queue<Matrix4x4>[] faceData = key.GetVoxelData();
                         for (byte i = 0; i < faceData.Length; i++)
                         {
                             if (faceData[i] == null)
