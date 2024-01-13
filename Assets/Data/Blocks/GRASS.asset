@@ -14,4 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: grass
   isTransparent: 0
+  occludeFacesWithSameTypeNeighbours: 0
+  useMainMaterial: 0
   main: {fileID: 2100000, guid: 76f374bbe9093e144b498114609dc3b4, type: 2}
+  textures:
+  - {fileID: 2100000, guid: 890a7d6792861724c8ac7f4134a7ff23, type: 2}
+  - {fileID: 2100000, guid: 890a7d6792861724c8ac7f4134a7ff23, type: 2}
+  - {fileID: 2100000, guid: d78293daf018d864caa1e4f101b6f373, type: 2}
+  - {fileID: 2100000, guid: fe83d034d2869fb41a27bb6133309f18, type: 2}
+  - {fileID: 2100000, guid: 890a7d6792861724c8ac7f4134a7ff23, type: 2}
+  - {fileID: 2100000, guid: 890a7d6792861724c8ac7f4134a7ff23, type: 2}
