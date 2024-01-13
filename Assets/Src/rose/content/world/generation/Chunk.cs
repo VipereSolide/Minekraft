@@ -9,12 +9,6 @@ using Debug = UnityEngine.Debug;
 
 namespace com.rose.content.world.generation
 {
-    public struct FaceData
-    {
-        public Matrix4x4 face;
-        public byte faceIndex;
-    }
-
     [Serializable]
     public class Chunk
     {
@@ -153,7 +147,7 @@ namespace com.rose.content.world.generation
             Quaternion rotation = Quaternion.LookRotation(-GetDirectionFromNeighbourIndex(faceIndex));
             renderedFace.SetTRS(position, rotation, Vector3.one);
 
-            return new() { face = renderedFace, faceIndex = (byte) faceIndex };
+            return new() { face = renderedFace, textureIndex = (byte) faceIndex };
         }
 
         public Vector3Int GetChunkGlobalCoordinate()

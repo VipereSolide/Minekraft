@@ -47,10 +47,10 @@ namespace com.rose.content.world.generation
 
                 foreach (var faceData in voxels)
                 {
-                    if (result[faceData.faceIndex] == null)
-                        result[faceData.faceIndex] = new();
+                    if (result[faceData.textureIndex] == null)
+                        result[faceData.textureIndex] = new();
 
-                    result[faceData.faceIndex].Add(faceData.face);
+                    result[faceData.textureIndex].Add(faceData.face);
                 }
 
                 return result;
