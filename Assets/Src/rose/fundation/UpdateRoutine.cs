@@ -34,9 +34,19 @@ namespace com.rose.fundation
         public void UpdateWaitingList()
         {
             if (waitingList.Count > 0)
+            {
                 for (int i = 0; i < capacity; i++)
+                {
                     if (updatingChunks[i] == null)
-                        SetUpdatingChunkAtIndex(waitingList.Dequeue(), i);
+                    {
+                        try
+                        {
+                            SetUpdatingChunkAtIndex(waitingList.Dequeue(), i);
+                        }
+                        catch { }
+                    }
+                }
+            }
         }
 
         public void RegisterChunkUpdate(Chunk chunk)

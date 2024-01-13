@@ -101,9 +101,9 @@ namespace com.rose.content.world.generation
         {
             chunks = new Chunk[mapSize.x, mapSize.y, mapSize.z];
 
-            for (int mapX = 0; mapX < mapSize.x; mapX++)
-                for (int mapZ = 0; mapZ < mapSize.z; mapZ++)
-                    for (int mapY = 0; mapY < mapSize.y; mapY++)
+            for (int mapY = 0; mapY < mapSize.y; mapY++)
+                for (int mapX = 0; mapX < mapSize.x; mapX++)
+                    for (int mapZ = 0; mapZ < mapSize.z; mapZ++)
                         chunks[mapX, mapY, mapZ] = new Chunk(this, new Vector3Int(mapX, mapY, mapZ));
         }
 
@@ -237,9 +237,9 @@ namespace com.rose.content.world.generation
             int halfRadius = Mathf.RoundToInt((float) radius / 2);
             HashSet<Chunk> result = new();
 
-            for (int x = -halfRadius; x < halfRadius; x++)
+            for (int y = -halfRadius; y < halfRadius; y++)
             {
-                for (int y = -halfRadius; y < halfRadius; y++)
+                for (int x = -halfRadius; x < halfRadius; x++)
                 {
                     for (int z = -halfRadius; z < halfRadius; z++)
                     {

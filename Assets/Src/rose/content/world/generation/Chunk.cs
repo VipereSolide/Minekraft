@@ -55,11 +55,11 @@ namespace com.rose.content.world.generation
 
             blockstates = new BlockState[chunkSize.x, chunkSize.y, chunkSize.z];
 
-            for (int x = 0; x < chunkSize.x; x++)
+            for (int y = 0; y < chunkSize.y; y++)
             {
-                for (int z = 0; z < chunkSize.z; z++)
+                for (int x = 0; x < chunkSize.x; x++)
                 {
-                    for (int y = 0; y < chunkSize.y; y++)
+                    for (int z = 0; z < chunkSize.z; z++)
                     {
                         Vector3Int localPosition = new(x, y, z);
                         blockstates[x, y, z] = world.GetNaturalBlockAtPosition(GetGlobalPositionFromLocalPosition(localPosition)).GetDefaultBlockState();
@@ -80,11 +80,11 @@ namespace com.rose.content.world.generation
                 if (!hasPopulatedBlockStateMap)
                     PopulateBlockStates();
 
-                for (int x = 0; x < chunkSize.x; x++)
+                for (int y = 0; y < chunkSize.y; y++)
                 {
-                    for (int z = 0; z < chunkSize.z; z++)
+                    for (int x = 0; x < chunkSize.x; x++)
                     {
-                        for (int y = 0; y < chunkSize.y; y++)
+                        for (int z = 0; z < chunkSize.z; z++)
                         {
                             Vector3Int pos = new(x, y, z);
                             cache.Add(GetRenderDataAtPosition(pos));
