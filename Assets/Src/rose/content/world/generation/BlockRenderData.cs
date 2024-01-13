@@ -2,6 +2,7 @@ using com.rose.content.world.content.block;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -44,8 +45,9 @@ namespace com.rose.content.world.generation
             public Queue<Matrix4x4>[] GetVoxelData()
             {
                 Queue<Matrix4x4>[] result = new Queue<Matrix4x4>[6];
+                var voxelsArray = voxels.ToArray();
 
-                foreach (var faceData in voxels)
+                foreach (var faceData in voxelsArray)
                 {
                     if (result[faceData.textureIndex] == null)
                         result[faceData.textureIndex] = new Queue<Matrix4x4>();
@@ -88,7 +90,9 @@ namespace com.rose.content.world.generation
             if (blocks.Contains(data.Item1))
                 blocks[data.Item1].voxels.AddRange(data.Item2);
             else
+            {
                 blocks.Add(new(data));
+            }
         }
     }
 }

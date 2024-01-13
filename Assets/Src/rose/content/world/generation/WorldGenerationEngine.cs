@@ -1,6 +1,7 @@
 using com.rose.content.world.content.block;
 using com.rose.content.world.entity.player;
 using com.rose.debugging.world.generation;
+using com.rose.fundation.extensions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -42,6 +43,7 @@ namespace com.rose.content.world.generation
             WorldGenerationDebugger.WorldGenerationEngineAwakens();
 
             player.transform.position = (mapSize * WorldData.chunkSize) / 2;
+            player.transform.position = player.transform.position.WithY(generator.GetSurfaceHeightFromGlobalPosition(player.GetGlobalPosition()) + 2);
             Initialize();
         }
 
@@ -72,7 +74,8 @@ namespace com.rose.content.world.generation
         private void Initialize()
         {
             if (randomSeed)
-                generator.noiseSettings.seed = new System.Random().Next(int.MaxValue);
+                foreach (var noiseSetting in generator.noiseSettings)
+                    noiseSetting.seed = new System.Random().Next(int.MaxValue);
 
             updateRoutine = new(WorldData.chunkUpdateRoutineWorkers);
             chunks = new Chunk[mapSize.x, mapSize.y, mapSize.z];
@@ -110,11 +113,11 @@ namespace com.rose.content.world.generation
                 {
                     if (chunk.hasRenderedChunkOnce)
                     {
+                        // await Task.Run(() => chunk.UpdateRenderDataCache());
                         chunk.UpdateRenderDataCache();
                     }
                     else
                     {
-                        //await Task.Run(() => chunk.UpdateRenderDataCache());
                         updateRoutine.RegisterChunkUpdate(chunk);
                     }
                 }
@@ -149,12 +152,12 @@ namespace com.rose.content.world.generation
 
         public HashSet<Chunk> GetNearbyChunks()
         {
-            return GetNearbyChunks(player.GetGlobalPosition(), WorldData.horizontalRenderDistance);
+            return GetNearbyChunks(player.GetGlobalPosition(), WorldData.generationDistance);
         }
 
         protected virtual void Render()
         {
-            foreach (var chunk in GetNearbyChunks())
+            foreach (var chunk in GetNearbyChunks(player.GetGlobalPosition(), WorldData.renderDistance))
             {
                 if (chunk.IsInitialized && ShouldChunkBeRendered(chunk))
                 {

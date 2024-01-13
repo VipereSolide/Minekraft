@@ -8,7 +8,7 @@ namespace com.rose.content.world.generation
     [System.Serializable]
     public class StandardMapGenerator : AbstractMapGenerator
     {
-        public NoiseSettings noiseSettings;
+        public NoiseSettings[] noiseSettings;
         public int maxHeight;
 
         [Header("Palette")]
@@ -18,9 +18,30 @@ namespace com.rose.content.world.generation
 
         private Random random;
 
+        private float MinimumOfAllNoises(Vector3Int pos)
+        {
+            float min = 9999999999;
+            foreach (var n in noiseSettings)
+            {
+                var v = n.Get().GetNoise(pos.x, pos.z);
+                if (v < min)
+                    min = v;
+            }
+            return min;
+        }
+
+        private float AddedOfAllNoises(Vector3Int pos)
+        {
+            float r = 0;
+            foreach (var n in noiseSettings)
+                r += n.Get().GetNoise(pos.x, pos.z);
+            return r;
+        }
+
         public int GetSurfaceHeightFromGlobalPosition(Vector3Int position)
         {
-            float noise = noiseSettings.Get().GetNoise(position.x, position.z);
+            float noise = AddedOfAllNoises(position);
+
             noise = noise.Remap(-1, 1, 0, 1);
             return Mathf.RoundToInt(noise * maxHeight);
         }
@@ -38,11 +59,11 @@ namespace com.rose.content.world.generation
         public override BlockEntry GetBlockAtPosition(Vector3Int position, BlockMap map)
         {
             random = new();
-
             int surface = GetSurfaceHeightFromGlobalPosition(position);
 
             if (position.y > surface)
                 return map.GetEntryByName("air");
+            return map.GetEntryByName("stone");
 
             BlockEntry _surface = surfaceBlock;
             if (position.y >= 60)

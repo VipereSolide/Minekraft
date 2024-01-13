@@ -34,6 +34,19 @@ namespace com.rose.debugging.world.generation
 
                 if (Input.GetKeyDown(KeyCode.C))
                     showChunkBorders = !showChunkBorders;
+
+                if (Input.GetKeyDown(KeyCode.L))
+                {
+                    var routine = WorldGenerationEngine.Instance.updateRoutine;
+                    Debug.Log($"Routine list size: {routine.waitingList.Count}");
+                    Debug.Log($"Routine updating chunks state:");
+
+                    for (int i = 0; i < routine.updatingChunks.Length; i++)
+                    {
+                        Chunk chunk = routine.updatingChunks[i];
+                        Debug.Log($"Is thread {i} free? {chunk == null}");
+                    }
+                }
             }
         }
 

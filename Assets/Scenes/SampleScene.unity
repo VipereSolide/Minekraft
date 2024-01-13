@@ -992,7 +992,9 @@ MonoBehaviour:
   faceMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   faceBaseMaterial: {fileID: 2100000, guid: 025a20e356a9fd443a951b534b898231, type: 2}
   generator:
-    noiseSettings: {fileID: 11400000, guid: c50baa1c15d4b52499731c410e9efa5e, type: 2}
+    noiseSettings:
+    - {fileID: 11400000, guid: 82a8f21957e4e694ea75c22e87e9839e, type: 2}
+    - {fileID: 11400000, guid: c50baa1c15d4b52499731c410e9efa5e, type: 2}
     maxHeight: 128
     surfaceBlock: {fileID: 11400000, guid: 32c06bf65cba4be4e82c94218791d241, type: 2}
     subsurfaceBlock: {fileID: 11400000, guid: d6b175f36fe4e1f43b2f7a68564ad9b4, type: 2}

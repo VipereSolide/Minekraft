@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class WorldData
 {
-    public static readonly Vector3Int chunkSize = new(16, 16, 16);
+    public static readonly Vector3Int chunkSize = new(32, 32, 32);
     public static readonly int textureSize = 16;
 
     /// <summary>
@@ -13,11 +13,17 @@ public static class WorldData
     /// <summary>
     /// Amount of chunks that can be treated at the same time.
     /// </summary>
-    public static int chunkUpdateRoutineWorkers = 7;
+    public static int chunkUpdateRoutineWorkers = 4;
 
     /// <summary>
-    /// Number of chunks rendered around the player.
+    /// Maximum distance after which chunks are not rendered anymore around the player position. Do not mistake this for the generationDistance;
+    /// The render distance is only what chunks are visually rendered, while the generationDistance is what chunks are being generated (populate
+    /// block map, first cache update).
     /// </summary>
-    public static int horizontalRenderDistance = 10;
-    //public static int verticalRenderDistance = 2 * 16;
+    public static int renderDistance = 10;
+
+    /// <summary>
+    /// Maximum distance after which chunks do not generate around the player position.
+    /// </summary>
+    public static int generationDistance = 2;
 }

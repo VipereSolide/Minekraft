@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: Framerate
   m_EditorClassIdentifier: Assembly-CSharp:com.rose.content:FramerateSettings
-  ingameTargetFramerate: 60
+  ingameTargetFramerate: 600
   unfocusedTargetFramerate: 3
