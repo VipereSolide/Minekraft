@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace com.rose.content.world.generation
 {
@@ -167,13 +166,13 @@ namespace com.rose.content.world.generation
                     {
                         if (key == null)
                         {
-                            Debug.LogWarning("CANNOT RENDER NULL KEY!");
+                            // Debug.LogWarning("CANNOT RENDER NULL KEY!");
                             continue;
                         }
 
                         if (key.voxels == null)
                         {
-                            Debug.LogWarning("CANNOT RENDER NULL VOXELS!");
+                            // Debug.LogWarning("CANNOT RENDER NULL VOXELS!");
                             continue;
                         }
 
